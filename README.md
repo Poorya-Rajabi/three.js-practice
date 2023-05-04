@@ -195,3 +195,75 @@ window.addEventListener('resize', () => {
 ```js
 renderrer.setPixelRation(Math.min(window.devicePixelRation, 2))
 ```
+
+----------
+Geometries
+----------
+#### Built-in geometries:
+* BoxGeometry
+* CapsuleGeometry
+* CircleGeometry
+* ConeGeometry
+* CylinderGeometry
+* DodecahedronGeometry
+* EdgesGeometry
+* ExtrudeGeometry
+* IcosahedronGeometry
+* LatheGeometry
+* OctahedronGeometry
+* PlaneGeometry
+* PolyhedronGeometry
+* RingGeometry
+* ShapeGeometry
+* SphereGeometry
+* TetrahedronGeometry
+* TorusGeometry
+* TorusKnotGeometry
+* TubeGeometry
+* WireframeGeometry
+
+```js
+// BoxGeometry
+const geometry = new THREE.BoxGeometry(1, 1, 1, 2, 2, 2)
+```
+BoxGeometry Parameters:
+* width — Width; that is, the length of the edges parallel to the X axis. Optional; defaults to 1.
+* height — Height; that is, the length of the edges parallel to the Y axis. Optional; defaults to 1.
+* depth — Depth; that is, the length of the edges parallel to the Z axis. Optional; defaults to 1.
+* widthSegments — Number of segmented rectangular faces along the width of the sides. Optional; defaults to 1.
+* heightSegments — Number of segmented rectangular faces along the height of the sides. Optional; defaults to 1.
+* depthSegments — Number of segmented rectangular faces along the depth of the sides. Optional; defaults to 1.
+
+```js
+// Wireframe
+const material = new THREE.MeshBasicMaterial( {
+color: 0x00ff00,
+wireframe: true
+} )
+```
+
+While wandering the three.js documentation you probably came across "BufferGeometry"
+Buffer Gerometries are more efficient and optimized but less developer friendly!
+```js
+// BoxBufferGeometry
+const geometry = new THREE.BoxBufferGeometry(1, 1, 1, 2, 2, 2)
+```
+
+Create Custom Geometry:
+```js
+const positionsArray = new Float32Array([
+    0, 0, 0,
+    0, 1, 0,
+    1, 0, 0
+])
+
+const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3)
+
+const geometry = new THREE.BoxBufferGeometry()
+geometry.setAttribute('position', positionsAttribute)
+
+const material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true })
+
+const mesh = new THREE.Mesh(geometry, material)
+scene.add(mesh)
+```

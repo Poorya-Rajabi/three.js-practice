@@ -14,8 +14,17 @@ const scene = new THREE.Scene()
 /**
  * Object
  */
-const geometry = new THREE.BoxGeometry(1, 1, 1)
-const material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
+const positionsArray = new Float32Array([
+    0, 0, 0, // first vertical
+    0, 1, 0, // second vertical
+    1, 0, 0  // third vertical
+])
+const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3)
+const geometry = new THREE.BoxBufferGeometry()
+geometry.setAttribute('position', positionsAttribute)
+
+const material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true })
+
 const mesh = new THREE.Mesh(geometry, material)
 scene.add(mesh)
 
@@ -47,6 +56,7 @@ window.addEventListener('resize', () => {
 
     // Update Renderer
     renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 })
 
 // Controls
