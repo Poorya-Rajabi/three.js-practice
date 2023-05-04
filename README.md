@@ -1,7 +1,7 @@
 # three.js-practice
 
 ## Setup
-Download [Node.js](https://nodejs.org/en/download/).
+Download [Node.js](https://nodejs.org/en/download/)
 Run this followed commands:
 
 ``` bash
@@ -14,6 +14,9 @@ npm run dev
 # Build for production in the dist/ directory
 npm run build
 ```
+
+## Demo
+You can try out by clicking on this [Demo Link](https://aquamarine-crisp-802505.netlify.app/).
 
 -----------
 three.js important topics - (just my note):
@@ -56,7 +59,7 @@ renderer.render(scene, camera)
 
 * Axes Helper:
 ```js
-new THREE.AxesHelper() => 3D helper (x: red, y: green, z: blue) like RGB
+new THREE.AxesHelper() // 3D helper (x: red, y: green, z: blue) like RGB
 ```
 
 * Position:
@@ -66,7 +69,7 @@ cube.position.set(2, 0.7, 1) //(x, y, z)
 //cube.position.y
 //cube.position.z
 
-cube.position.length() // distance from center of scene
+cube.position.length() // The distance from the center of the object to the center of scene
 
 cube.position.distanceTo(camera.position) // distance from other object
 
@@ -97,7 +100,6 @@ cube.rotation.reorder('YXZ')
 * lookAt:
 ```js
 camera.lookAt(cube.position) // change camera position to current object
-camera.lookAt(cube.position)
 ```
 
 -----------
@@ -111,8 +113,8 @@ Don't forget you need to render in animation function
 
 * Time:
 ```js
-const clock = new THREE.Clock() => for the same animation in all computer
-const elapsedTime = clock.getElapsedTime() => time of reprint
+const clock = new THREE.Clock() // for the same animation in all computer
+const elapsedTime = clock.getElapsedTime() // time of reprint
 mesh.position = elapsedTime
 ```
 
@@ -251,10 +253,11 @@ const geometry = new THREE.BoxBufferGeometry(1, 1, 1, 2, 2, 2)
 
 Create Custom Geometry:
 ```js
+// create a triangle
 const positionsArray = new Float32Array([
-    0, 0, 0,
-    0, 1, 0,
-    1, 0, 0
+    0, 0, 0, // first vertical
+    0, 1, 0, // second vertical
+    1, 0, 0  // third vertical
 ])
 
 const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3)

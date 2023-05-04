@@ -15,23 +15,23 @@ const scene = new THREE.Scene()
  * Objects
  */
 const geometry = new THREE.BufferGeometry()
-const count = 2000
+const count = 100
 const positionsArray = new Float32Array(count * 3 * 3) // count * vertex * (x+y+z)
 for(let i = 0; i < count * 3 * 3; i++) {
-    positionsArray[i] = (Math.random() - 0.5) * 4
+    positionsArray[i] = (Math.random() - 0.5) * 2
 }
 const positionsAttr = new THREE.BufferAttribute(positionsArray, 3)
 geometry.setAttribute('position', positionsAttr)
 
 const material = new THREE.MeshBasicMaterial({
     color: 'gold',
-    wireframe: true
+    wireframe: false
 })
 const mesh = new THREE.Mesh(geometry, material)
 scene.add(mesh)
 
 // Cube
-const cube = new THREE.BoxBufferGeometry(4, 4, 4, 2, 2, 2)
+const cube = new THREE.BoxBufferGeometry(2, 2, 2, 2, 2, 2)
 const cubeMaterial = new THREE.MeshBasicMaterial((
     {
         color: 'red',
