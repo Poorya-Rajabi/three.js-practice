@@ -25,7 +25,7 @@ geometry.setAttribute('position', positionsAttr)
 
 const material = new THREE.MeshBasicMaterial({
     color: 'gold',
-    wireframe: false
+    wireframe: true
 })
 const mesh = new THREE.Mesh(geometry, material)
 scene.add(mesh)
