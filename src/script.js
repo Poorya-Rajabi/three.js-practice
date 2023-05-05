@@ -1,6 +1,8 @@
 import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import * as dat from 'dat.gui'
+import gsap from 'gsap'
 
 /**
  * Base
@@ -10,6 +12,16 @@ const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
+
+// Parameters
+const parameters = {
+    color: 0x303030,
+    spin: () => {
+        gsap.to(group.rotation, {
+            duration: 1, y: group.rotation.y + (Math.PI * 2)
+        })
+    }
+}
 
 /**
  * Objects
@@ -24,22 +36,25 @@ const positionsAttr = new THREE.BufferAttribute(positionsArray, 3)
 geometry.setAttribute('position', positionsAttr)
 
 const material = new THREE.MeshBasicMaterial({
-    color: 'gold',
+    color: parameters.color ,
     wireframe: true
 })
 const mesh = new THREE.Mesh(geometry, material)
-scene.add(mesh)
+// scene.add(mesh)
 
 // Cube
 const cube = new THREE.BoxBufferGeometry(2, 2, 2, 2, 2, 2)
-const cubeMaterial = new THREE.MeshBasicMaterial((
-    {
-        color: 'red',
-        wireframe: true
-    }
-))
+const cubeMaterial = new THREE.MeshNormalMaterial({
+    wireframe: true
+})
 const mesh2 = new THREE.Mesh(cube, cubeMaterial)
-scene.add(mesh2)
+// scene.add(mesh2)
+
+// Group
+const group = new THREE.Group()
+group.add(mesh)
+group.add(mesh2)
+scene.add(group)
 
 
 /**
@@ -75,7 +90,8 @@ window.addEventListener('resize', () => {
 
 // Controls
 const controls = new OrbitControls(camera, canvas)
-controls.enableDamping = true
+controls.enableDamping = true // smooth moving on rotate
+controls.enablePan = false // moving object by right click or two finger in mobile
 
 /**
  * Renderer
@@ -106,3 +122,31 @@ const tick = () =>
 }
 
 tick()
+
+/**
+ * GUI
+ */
+const gui = new dat.GUI({ closed: true, width: 400 })
+// gui.hide() // if you want the panel to be hidden at start
+
+// Cube Positions
+gui.add(group.position, 'x').min(-3).max(3).step(0.01)
+gui.add(group.position, 'y').min(-3).max(3).step(0.01)
+gui.add(group.position, 'z').min(-3).max(3).step(0.01)
+
+// Cube Visibility
+gui.add(group, 'visible').name('box')
+gui.add(mesh, 'visible').name('box inside')
+gui.add(mesh2, 'visible').name('box wireframe')
+
+// Material
+gui.add(mesh2.material, 'wireframe')
+
+// Change Color
+gui.addColor(parameters, 'color')
+    .onChange(() => {
+        mesh.material.color.set(parameters.color)
+    })
+
+// Functions
+gui.add(parameters, 'spin').name('CLICK TO SPIN')

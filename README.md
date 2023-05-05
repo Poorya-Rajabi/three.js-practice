@@ -1,9 +1,6 @@
 # three.js-practice
 
 ## Setup
-Download [Node.js](https://nodejs.org/en/download/)
-Run this followed commands:
-
 ``` bash
 # Install dependencies (only the first time)
 npm install
@@ -19,8 +16,7 @@ npm run build
 You can try out by clicking on this [Demo Link](https://aquamarine-crisp-802505.netlify.app/).
 
 -----------
-three.js important topics - (just my note):
-========
+three.js important topics - (just an example from each topic):
 
 BASICS
 ---------
@@ -156,14 +152,14 @@ const camera = new THREE.OrthographicCamera( -1 * aspect, aspect, -1, 1, 0.1, 10
 ----------
  CONTROLS
 ----------
-* DeviceOrientationControls: mobile giroscope
-* flyControls: control by mouse like a airplane
-* firstPersonControl: is like FlyControl, but with a fixed up axies. (birds & game)
-* pointerLockControl: change camera by mouse  (conter strike game)
-* orbitControl: similar the controls we made with more features (simon website)
+* DeviceOrientationControls: mobile gyroscope (deprecated!)
+* flyControls: enables a navigation similar to fly modes in DCC tools like Blender.
+* firstPersonControl: is like FlyControl, but with a fixed-up axis. (birds & game)
+* pointerLockControl: change camera by mouse  (Counter-Strike game), is a perfect choice for first person 3D games.
+* orbitControl: similar to the controls we made with more features (simon website)
 * trackableControl: like orbitControl without the vertical angle limit
 * transformControl: changes objects position
-* dargControl: like transformControl (lookat camera)
+* dargControl: can be used to provide a drag'n'drop interaction.
 
 ```js
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
@@ -199,7 +195,7 @@ renderrer.setPixelRation(Math.min(window.devicePixelRation, 2))
 ```
 
 ----------
-Geometries
+GEOMETRIES
 ----------
 #### Built-in geometries:
 * BoxGeometry
@@ -286,3 +282,85 @@ const positionsAttr = new THREE.BufferAttribute(positionsArray, 3)
 
 geometry.setAttribute('position', positionsAttr)
 ```
+
+----------
+DEBUG UI
+----------
+debug libraries:
+* dat.GUI
+* control-panel
+* ControlKit
+* Guify
+* Oui
+
+dat.GUI:
+```js
+import * as dat from 'dat.gui'
+
+const gui = new dat.GUI()
+```
+dat.GUI parameters:
+* Range
+* Color
+* Text
+* Checkbox
+* Select
+* Button
+* Folder
+
+```js
+/**
+ * GUI
+ */
+const gui = new dat.GUI()
+
+// Parameters
+const parameters = {
+    color: 0x303030,
+    spin: () => {
+        gsap.to(group.rotation, {
+            duration: 1, y: group.rotation.y + (Math.PI * 2)
+        })
+    }
+}
+
+// Cube Positions
+gui.add(group.position, 'x').min(-3).max(3).step(0.01).name('position)
+
+// Cube Visibility
+gui.add(group, 'visible').name('box')
+gui.add(mesh, 'visible').name('box inside')
+gui.add(mesh2, 'visible').name('box wireframe')
+
+// Material
+gui.add(mesh2.material, 'wireframe')
+
+// Change Color
+gui.addColor(parameters, 'color')
+    .onChange(() => {
+        mesh.material.color.set(parameters.color)
+    })
+
+// Functions
+gui.add(parameters, 'spin').name('CLICK TO SPIN')
+```
+
+## GUI Hints
+Press 'H' to hide the panel.
+
+if you want the panel to be hidden at start:
+```js
+gui.hide()
+```
+
+if you want the panel to be closed at start:
+```js
+const gui = new dat.GUI({ closed: true })
+```
+
+You can drag and drop the panel to change its width
+You can change the default width:
+```js
+const gui = new dat.GUI({ width: 400 })
+```
+Github repository: [dataarts/dat.gui](https://github.com/dataarts/dat.gui)
