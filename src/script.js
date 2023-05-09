@@ -51,7 +51,7 @@ LoadingManager.onError = () => {
     console.log('onError')
 }
 
-const textureLoader = new THREE.TextureLoader()
+const textureLoader = new THREE.TextureLoader(LoadingManager)
 const colorTexture = textureLoader.load('/textures/door/color.jpg')
 const alphaTexture = textureLoader.load('/textures/door/alpha.jpg')
 const heightTexture = textureLoader.load('/textures/door/height.jpg')
@@ -74,7 +74,7 @@ colorTexture.center.x = 0.5
 colorTexture.center.y = 0.5
 
 
-const txGeometry = new THREE.BoxBufferGeometry(2, 2, 2)
+const txGeometry = new THREE.TorusKnotBufferGeometry( 3, 1, 100, 16 )
 const txMaterial = new THREE.MeshBasicMaterial({ map: colorTexture })
 const txMesh = new THREE.Mesh(txGeometry, txMaterial)
 scene.add(txMesh)
