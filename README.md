@@ -368,14 +368,60 @@ Github repository: [dataarts/dat.gui](https://github.com/dataarts/dat.gui)
 ----------
 TEXTURES
 ----------
-free textures: <br />
-[3dtextures.me](https://3dtextures.me)
+* free textures: <br />
+[d3dtextures.me](https://3dtextures.me) <br />
 
-texture examples: <br />
+* texture example: <br />
 [wood-herringbone-tiles-004](https://3dtextures.me/2022/09/15/wood-herringbone-tiles-004/) <br />
 [metal-006](https://3dtextures.me/2022/05/13/metal-006/) <br />
 [stylized-fur-02](https://3dtextures.me/2022/04/09/stylized-fur-02/) <br />
 
-read the following documents to understand the textures: <br />
+* read the following documents to understand the textures: <br />
 [https://marmoset.co/posts/basic-theory-of-physically-based-rendering/](https://marmoset.co/posts/basic-theory-of-physically-based-rendering/) <br />
-[https://marmoset.co/posts/physically-based-rendering-and-you-can-too/](https://marmoset.co/posts/physically-based-rendering-and-you-can-too/)
+[https://marmoset.co/posts/physically-based-rendering-and-you-can-too/](https://marmoset.co/posts/physically-based-rendering-and-you-can-too/) <br />
+
+
+
+load and create a texture:
+```js
+const textureLoader = new THREE.TextureLoader()
+const texture = textureLoader.load('/textures/door/color.jpg')
+
+const material = new THREE.MeshBasicMaterial({ map: texture })
+```
+
+* LoadingManager
+```js
+const LoadingManager = new THREE.LoadingManager()
+
+LoadingManager.onStart = () => {
+    console.log('onStart')
+}
+LoadingManager.onProgress = () => {
+    console.log('onProgress')
+}
+LoadingManager.onLoad = () => {
+    console.log('onLoad')
+}
+LoadingManager.onError = () => {
+    console.log('onError')
+}
+
+const textureLoader = new THREE.TextureLoader(LoadingManager)
+```
+
+textures some options
+```js
+colorTexture.repeat.x = 2
+colorTexture.repeat.y = 3
+
+colorTexture.wrapS = THREE.MirroredRepeatWrapping
+colorTexture.wrapT = THREE.RepeatWrapping
+
+colorTexture.offset.x = 0.5
+colorTexture.offset.y = 0.5
+
+colorTexture.rotation = Math.PI / 4
+colorTexture.center.x = 0.5
+colorTexture.center.y = 0.5
+```

@@ -37,11 +37,45 @@ const parameters = {
 // }
 
 // best practice for load texture
+const LoadingManager = new THREE.LoadingManager()
+LoadingManager.onStart = () => {
+    console.log('onStart')
+}
+LoadingManager.onProgress = () => {
+    console.log('onProgress')
+}
+LoadingManager.onLoad = () => {
+    console.log('onLoad')
+}
+LoadingManager.onError = () => {
+    console.log('onError')
+}
+
 const textureLoader = new THREE.TextureLoader()
-const texture = textureLoader.load('/textures/door/color.jpg')
+const colorTexture = textureLoader.load('/textures/door/color.jpg')
+const alphaTexture = textureLoader.load('/textures/door/alpha.jpg')
+const heightTexture = textureLoader.load('/textures/door/height.jpg')
+const metalnessTexture = textureLoader.load('/textures/door/metalness.jpg')
+const normalTexture = textureLoader.load('/textures/door/normal.jpg')
+const roughnessTexture = textureLoader.load('/textures/door/roughness.jpg')
+const ambientOcclusionTexture = textureLoader.load('/textures/door/ambientOcclusion.jpg')
+
+colorTexture.repeat.x = 2
+colorTexture.repeat.y = 3
+
+colorTexture.wrapS = THREE.MirroredRepeatWrapping
+colorTexture.wrapT = THREE.RepeatWrapping
+
+colorTexture.offset.x = 0.5
+colorTexture.offset.y = 0.5
+
+colorTexture.rotation = Math.PI / 4
+colorTexture.center.x = 0.5
+colorTexture.center.y = 0.5
+
 
 const txGeometry = new THREE.BoxBufferGeometry(2, 2, 2)
-const txMaterial = new THREE.MeshBasicMaterial({ map: texture })
+const txMaterial = new THREE.MeshBasicMaterial({ map: colorTexture })
 const txMesh = new THREE.Mesh(txGeometry, txMaterial)
 scene.add(txMesh)
 
@@ -151,7 +185,7 @@ tick()
  * GUI
  */
 const gui = new dat.GUI({ closed: true, width: 400 })
-// gui.hide() // if you want the panel to be hidden at start
+gui.hide() // if you want the panel to be hidden at start
 
 // Cube Positions
 gui.add(group.position, 'x').min(-3).max(3).step(0.01)
