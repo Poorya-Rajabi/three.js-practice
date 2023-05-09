@@ -364,3 +364,18 @@ You can change the default width:
 const gui = new dat.GUI({ width: 400 })
 ```
 Github repository: [dataarts/dat.gui](https://github.com/dataarts/dat.gui)
+
+----------
+TEXTURES
+----------
+free textures: <br />
+[3dtextures.me](https://3dtextures.me)
+
+texture examples: <br />
+[wood-herringbone-tiles-004](https://3dtextures.me/2022/09/15/wood-herringbone-tiles-004/) <br />
+[metal-006](https://3dtextures.me/2022/05/13/metal-006/) <br />
+[stylized-fur-02](https://3dtextures.me/2022/04/09/stylized-fur-02/) <br />
+
+read the following documents to understand the textures: <br />
+[https://marmoset.co/posts/basic-theory-of-physically-based-rendering/](https://marmoset.co/posts/basic-theory-of-physically-based-rendering/) <br />
+[https://marmoset.co/posts/physically-based-rendering-and-you-can-too/](https://marmoset.co/posts/physically-based-rendering-and-you-can-too/)

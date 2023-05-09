@@ -127,7 +127,7 @@ tick()
  * GUI
  */
 const gui = new dat.GUI({ closed: true, width: 400 })
-gui.hide() // if you want the panel to be hidden at start
+// gui.hide() // if you want the panel to be hidden at start
 
 // Cube Positions
 gui.add(group.position, 'x').min(-3).max(3).step(0.01)
