@@ -24,6 +24,28 @@ const parameters = {
 }
 
 /**
+ * Textures
+ */
+
+//load texture
+// load and create a texture
+// const image = new Image()
+// let texture = new THREE.Texture(image)
+// image.src = '/textures/door/color.jpg'
+// image.onload = () => {
+//     texture.needsUpdate = true
+// }
+
+// best practice for load texture
+const textureLoader = new THREE.TextureLoader()
+const texture = textureLoader.load('/textures/door/color.jpg')
+
+const txGeometry = new THREE.BoxBufferGeometry(2, 2, 2)
+const txMaterial = new THREE.MeshBasicMaterial({ map: texture })
+const txMesh = new THREE.Mesh(txGeometry, txMaterial)
+scene.add(txMesh)
+
+/**
  * Objects
  */
 const geometry = new THREE.BufferGeometry()
@@ -55,6 +77,8 @@ const group = new THREE.Group()
 group.add(mesh)
 group.add(mesh2)
 scene.add(group)
+
+group.visible = false // for checking texture cube
 
 
 /**
