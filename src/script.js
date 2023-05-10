@@ -52,7 +52,7 @@ LoadingManager.onError = () => {
 }
 
 const textureLoader = new THREE.TextureLoader(LoadingManager)
-const colorTexture = textureLoader.load('/textures/door/color.jpg')
+const colorTexture = textureLoader.load('/textures/checkerboard-1024x1024.png')
 const alphaTexture = textureLoader.load('/textures/door/alpha.jpg')
 const heightTexture = textureLoader.load('/textures/door/height.jpg')
 const metalnessTexture = textureLoader.load('/textures/door/metalness.jpg')
@@ -60,24 +60,33 @@ const normalTexture = textureLoader.load('/textures/door/normal.jpg')
 const roughnessTexture = textureLoader.load('/textures/door/roughness.jpg')
 const ambientOcclusionTexture = textureLoader.load('/textures/door/ambientOcclusion.jpg')
 
-colorTexture.repeat.x = 2
-colorTexture.repeat.y = 3
+// colorTexture.repeat.x = 2
+// colorTexture.repeat.y = 3
+//
+// colorTexture.wrapS = THREE.MirroredRepeatWrapping
+// colorTexture.wrapT = THREE.RepeatWrapping
+//
+// colorTexture.offset.x = 0.5
+// colorTexture.offset.y = 0.5
+//
+// colorTexture.rotation = Math.PI / 4
+// colorTexture.center.x = 0.5
+// colorTexture.center.y = 0.5
 
-colorTexture.wrapS = THREE.MirroredRepeatWrapping
-colorTexture.wrapT = THREE.RepeatWrapping
-
-colorTexture.offset.x = 0.5
-colorTexture.offset.y = 0.5
-
-colorTexture.rotation = Math.PI / 4
-colorTexture.center.x = 0.5
-colorTexture.center.y = 0.5
+colorTexture.minFilter = THREE.NearestFilter
+// colorTexture.minFilter = THREE.LinearFilter
+// colorTexture.minFilter = THREE.NearestMipmapNearestFilter
+// colorTexture.minFilter = THREE.NearestMipmapLinearFilter
+// colorTexture.minFilter = THREE.LinearMipmapNearestFilter
+// colorTexture.minFilter = THREE.LinearMipmapLinearFilter // (Default)
 
 
-const txGeometry = new THREE.TorusKnotBufferGeometry( 3, 1, 100, 16 )
+const txGeometry = new THREE.BoxBufferGeometry( 2, 2, 2 )
 const txMaterial = new THREE.MeshBasicMaterial({ map: colorTexture })
 const txMesh = new THREE.Mesh(txGeometry, txMaterial)
 scene.add(txMesh)
+
+txMesh.rotation.x = 0.5
 
 /**
  * Objects

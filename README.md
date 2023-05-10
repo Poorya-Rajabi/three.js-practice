@@ -425,3 +425,14 @@ colorTexture.rotation = Math.PI / 4
 colorTexture.center.x = 0.5
 colorTexture.center.y = 0.5
 ```
+
+Filtering and Mipmapping:
+* THREE.NearestFilter
+* THREE.LinearFilter
+* THREE.NearestMipmapNearestFilter
+* THREE.NearestMipmapLinearFilter
+* THREE.LinearMipmapNearestFilter
+* THREE.LinearMipmapLinearFilter (Default)
+```js
+colorTexture.minFilter = THREE.NearestFilter
+```
