@@ -368,13 +368,13 @@ Github repository: [dataarts/dat.gui](https://github.com/dataarts/dat.gui)
 ----------
 TEXTURES
 ----------
-* free textures: <br />
-[d3dtextures.me](https://3dtextures.me) <br />
+* textures resources: <br />
+[https://3dtextures.me](https://3dtextures.me) <br />
+[https://www.poliigon.com](https://www.poliigon.com/) <br />
+[https://www.arroway-textures.ch/](https://www.arroway-textures.ch/) <br />
 
-* texture example: <br />
-[wood-herringbone-tiles-004](https://3dtextures.me/2022/09/15/wood-herringbone-tiles-004/) <br />
-[metal-006](https://3dtextures.me/2022/05/13/metal-006/) <br />
-[stylized-fur-02](https://3dtextures.me/2022/04/09/stylized-fur-02/) <br />
+you can create your own texture: <br />
+[http://substance3d.com/](http://substance3d.com/) <br />
 
 * read the following documents to understand the textures: <br />
 [https://marmoset.co/posts/basic-theory-of-physically-based-rendering/](https://marmoset.co/posts/basic-theory-of-physically-based-rendering/) <br />
@@ -390,7 +390,7 @@ const texture = textureLoader.load('/textures/door/color.jpg')
 const material = new THREE.MeshBasicMaterial({ map: texture })
 ```
 
-* LoadingManager
+LoadingManager
 ```js
 const LoadingManager = new THREE.LoadingManager()
 
@@ -410,7 +410,7 @@ LoadingManager.onError = () => {
 const textureLoader = new THREE.TextureLoader(LoadingManager)
 ```
 
-textures some options
+textures some options:
 ```js
 colorTexture.repeat.x = 2
 colorTexture.repeat.y = 3
@@ -426,7 +426,7 @@ colorTexture.center.x = 0.5
 colorTexture.center.y = 0.5
 ```
 
-Filtering and Mipmapping:
+Filtering & Mipmapping:
 * THREE.NearestFilter
 * THREE.LinearFilter
 * THREE.NearestMipmapNearestFilter
@@ -434,5 +434,11 @@ Filtering and Mipmapping:
 * THREE.LinearMipmapNearestFilter
 * THREE.LinearMipmapLinearFilter (Default)
 ```js
+// better for performance and sharp result
+colorTexture.generateMipmaps = false
 colorTexture.minFilter = THREE.NearestFilter
+colorTexture.magFilter = THREE.NearestFilter
 ```
+
+Format and Optimisation:
+Size , Weight, Data

@@ -52,7 +52,7 @@ LoadingManager.onError = () => {
 }
 
 const textureLoader = new THREE.TextureLoader(LoadingManager)
-const colorTexture = textureLoader.load('/textures/checkerboard-1024x1024.png')
+const colorTexture = textureLoader.load('/textures/minecraft.png')
 const alphaTexture = textureLoader.load('/textures/door/alpha.jpg')
 const heightTexture = textureLoader.load('/textures/door/height.jpg')
 const metalnessTexture = textureLoader.load('/textures/door/metalness.jpg')
@@ -73,7 +73,10 @@ const ambientOcclusionTexture = textureLoader.load('/textures/door/ambientOcclus
 // colorTexture.center.x = 0.5
 // colorTexture.center.y = 0.5
 
+// better for performance and sharp result
+colorTexture.generateMipmaps = false
 colorTexture.minFilter = THREE.NearestFilter
+colorTexture.magFilter = THREE.NearestFilter
 // colorTexture.minFilter = THREE.LinearFilter
 // colorTexture.minFilter = THREE.NearestMipmapNearestFilter
 // colorTexture.minFilter = THREE.NearestMipmapLinearFilter
