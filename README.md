@@ -444,3 +444,68 @@ colorTexture.magFilter = THREE.NearestFilter
 
 Format and Optimisation:
 Size , Weight, Data
+
+-----------
+ MATERIALS
+-----------
+* MeshBasicMaterial
+```js
+const material = new THREE.MeshBasicMaterial()
+material.color = new THREE.Color(0x00ff00)
+material.wireframe = true
+material.side = THREE.DoubleSide  // FrontSide(Default), BackSide, DoubleSide
+material.transparent = true
+material.opacity = 0.7
+material.map = colorDoorTexture
+material.alphaMap = alphaDoorTexture
+```
+
+* MeshNormalMaterial
+```js
+const material = new THREE.MeshNormalMaterial()
+material.flatShading = true
+```
+
+* MeshMatcapMaterial
+```js
+const material = new THREE.MeshMatcapMaterial()
+material.matcap = matcapTexture
+```
+matcaps resource:
+[https://github.com/nidorx/matcaps](https://github.com/nidorx/matcaps)
+
+* MeshDepthMaterial
+```js
+const material = new THREE.MeshDepthMaterial()
+```
+
+
+* MeshLambertMaterial (need lights)
+```js
+const material = new THREE.MeshLambertMaterial()
+```
+
+* MeshPhongMaterial (need lights)
+```js
+const material = new THREE.MeshPhongMaterial()
+material.shininess = 100
+material.specular = new THREE.Color(0xff00ff)
+```
+
+* MeshToonMaterial (need lights)
+```js
+const material = new THREE.MeshToonMaterial()
+material.gradientMap = gradientTexture
+```
+
+Simple Light (just for testing materials):
+```js
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
+scene.add(ambientLight)
+
+const pointLight = new THREE.PointLight(0xffffff, 0.5)
+pointLight.position.x = 2
+pointLight.position.x = 3
+pointLight.position.x = 4
+scene.add(pointLight)
+```
