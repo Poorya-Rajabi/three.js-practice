@@ -52,7 +52,7 @@ LoadingManager.onError = () => {
 }
 
 const textureLoader = new THREE.TextureLoader(LoadingManager)
-const colorTexture = textureLoader.load('/textures/minecraft.png')
+const colorTexture = textureLoader.load('/textures/custom-texture.png')
 const alphaTexture = textureLoader.load('/textures/door/alpha.jpg')
 const heightTexture = textureLoader.load('/textures/door/height.jpg')
 const metalnessTexture = textureLoader.load('/textures/door/metalness.jpg')
@@ -60,23 +60,24 @@ const normalTexture = textureLoader.load('/textures/door/normal.jpg')
 const roughnessTexture = textureLoader.load('/textures/door/roughness.jpg')
 const ambientOcclusionTexture = textureLoader.load('/textures/door/ambientOcclusion.jpg')
 
-// colorTexture.repeat.x = 2
-// colorTexture.repeat.y = 3
+colorTexture.repeat.x = 2
+colorTexture.repeat.y = 2
+colorTexture.repeat.set( 1, 4 )
 //
-// colorTexture.wrapS = THREE.MirroredRepeatWrapping
-// colorTexture.wrapT = THREE.RepeatWrapping
-//
+colorTexture.wrapS = THREE.MirroredRepeatWrapping
+colorTexture.wrapT = THREE.RepeatWrapping
+// //
 // colorTexture.offset.x = 0.5
 // colorTexture.offset.y = 0.5
-//
+// //
 // colorTexture.rotation = Math.PI / 4
 // colorTexture.center.x = 0.5
 // colorTexture.center.y = 0.5
 
 // better for performance and sharp result
-colorTexture.generateMipmaps = false
+// colorTexture.generateMipmaps = false
 colorTexture.minFilter = THREE.NearestFilter
-colorTexture.magFilter = THREE.NearestFilter
+// colorTexture.magFilter = THREE.NearestFilter
 // colorTexture.minFilter = THREE.LinearFilter
 // colorTexture.minFilter = THREE.NearestMipmapNearestFilter
 // colorTexture.minFilter = THREE.NearestMipmapLinearFilter
@@ -87,9 +88,27 @@ colorTexture.magFilter = THREE.NearestFilter
 const txGeometry = new THREE.BoxBufferGeometry( 2, 2, 2 )
 const txMaterial = new THREE.MeshBasicMaterial({ map: colorTexture })
 const txMesh = new THREE.Mesh(txGeometry, txMaterial)
-scene.add(txMesh)
+// scene.add(txMesh)
 
-txMesh.rotation.x = 0.5
+const arr = []
+for(let i = 0; i < 10; i++) {
+    arr[i] = new THREE.BoxBufferGeometry( 2, 2, 2 )
+    arr[i] = new THREE.Mesh(arr[i], txMaterial)
+    scene.add(arr[i])
+}
+
+for(let i = 0; i < 4; i++) {
+    arr[i].position.x = -2
+    arr[i].position.y = i*2 - 4
+}
+
+for(let i = 4; i < 8; i++) {
+    arr[i].position.x = 2
+    arr[i].position.y = (i - 4) *2 - 4
+}
+
+arr[9].position.y = 2
+arr[8].position.y = -2
 
 /**
  * Objects

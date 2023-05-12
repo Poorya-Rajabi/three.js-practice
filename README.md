@@ -373,7 +373,7 @@ TEXTURES
 [https://www.poliigon.com](https://www.poliigon.com/) <br />
 [https://www.arroway-textures.ch/](https://www.arroway-textures.ch/) <br />
 
-you can create your own texture: <br />
+* you can create your own texture: <br />
 [http://substance3d.com/](http://substance3d.com/) <br />
 
 * read the following documents to understand the textures: <br />
@@ -414,6 +414,8 @@ textures some options:
 ```js
 colorTexture.repeat.x = 2
 colorTexture.repeat.y = 3
+// or
+colorTexture.repeat.set( 2, 3 )
 
 colorTexture.wrapS = THREE.MirroredRepeatWrapping
 colorTexture.wrapT = THREE.RepeatWrapping
