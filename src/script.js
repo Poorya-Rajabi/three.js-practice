@@ -76,27 +76,41 @@ const scene = new THREE.Scene()
 // material.metalness = 0.5
 // material.roughness = 0.5
 
-// const material = new THREE.MeshStandardMaterial()
-// material.metalness = 0
-// material.roughness = 1
-// material.aoMapIntensity = 1
-// material.side = THREE.DoubleSide
-// material.map = colorDoorTexture
-// material.aoMap = ambientOcclusionDoorTexture
-// material.displacementMap = heightDoorTexture
-// material.displacementScale = 0.05
-// material.metalnessMap = metalnessDoorTexture
-// material.roughnessMap = roughnessDoorTexture
-// material.normalMap = normalDoorTexture
-// material.normalScale.set(0.5, 0.5)
-// material.transparent = true
-// material.alphaMap = alphaDoorTexture
+let material = new THREE.MeshStandardMaterial()
 
-const material = new THREE.MeshStandardMaterial()
-material.metalness = 1
-material.roughness = 0
-material.side = THREE.DoubleSide
-material.envMap = environmentMapsTexture
+function setStandardMaterial() {
+    material.setValues(new THREE.MeshStandardMaterial())
+    material.metalness = 0
+    material.roughness = 1
+    material.aoMapIntensity = 1
+    material.side = THREE.DoubleSide
+    material.map = colorDoorTexture
+    material.aoMap = ambientOcclusionDoorTexture
+    material.displacementMap = heightDoorTexture
+    material.displacementScale = 0.05
+    material.metalnessMap = metalnessDoorTexture
+    material.roughnessMap = roughnessDoorTexture
+    material.normalMap = normalDoorTexture
+    material.normalScale.set(0.5, 0.5)
+    material.transparent = true
+    material.alphaMap = alphaDoorTexture
+}
+
+function setenvMapMaterial() {
+    material.setValues(new THREE.MeshStandardMaterial())
+    material.metalness = 1
+    material.roughness = 0
+    material.side = THREE.DoubleSide
+    material.envMap = environmentMapsTexture
+}
+
+setenvMapMaterial()
+
+// const material = new THREE.MeshStandardMaterial()
+// material.metalness = 1
+// material.roughness = 0
+// material.side = THREE.DoubleSide
+// material.envMap = environmentMapsTexture
 
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
@@ -218,6 +232,17 @@ tick()
 /**
  * GUI
  */
+const actions = {
+    envMap: () => {
+        setenvMapMaterial()
+        toggleMaterial('envMap')
+    },
+    standard: () => {
+        setStandardMaterial()
+        toggleMaterial('standard')
+    }
+}
+
 const gui = new dat.GUI({ closed: true })
 gui.add(material, 'metalness').min(0).max(1).step(0.001)
 gui.add(material, 'roughness').min(0).max(1).step(0.001)
@@ -225,3 +250,15 @@ gui.add(material, 'roughness').min(0).max(1).step(0.001)
 // gui.add(material, 'displacementScale').min(0).max(1).step(0.001)
 // gui.add(material.normalScale, 'x').min(0).max(1).step(0.001).name('Normal Scale X')
 // gui.add(material.normalScale, 'y').min(0).max(1).step(0.001).name('Normal Scale Y')
+
+
+let availableMaterial = 'standard'
+let currentMaterial = 'envMap'
+let item = gui.add(actions, availableMaterial).name('Change Material')
+function toggleMaterial(type) {
+    currentMaterial = type
+    availableMaterial = type === 'standard' ? 'envMap' : 'standard'
+    gui.remove(item)
+    item = gui.add(actions, availableMaterial).name('Change Material')
+}
+// gui.add(actions, availableMaterial).name(`Change to ${currentMaterial}`)
