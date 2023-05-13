@@ -1,23 +1,24 @@
 import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import * as dat from 'dat.gui'
 
 /**
  * Textures
  */
 const textureLoader = new THREE.TextureLoader()
 const colorDoorTexture = textureLoader.load('/textures/door/color.jpg')
-const alphaDoorTexture = textureLoader.load('/textures/door/alpha.jpg')
-const heightDoorTexture = textureLoader.load('/textures/door/height.jpg')
-const metalnessDoorTexture = textureLoader.load('/textures/door/metalness.jpg')
-const normalDoorTexture = textureLoader.load('/textures/door/normal.jpg')
-const roughnessDoorTexture = textureLoader.load('/textures/door/roughness.jpg')
+// const alphaDoorTexture = textureLoader.load('/textures/door/alpha.jpg')
+// const heightDoorTexture = textureLoader.load('/textures/door/height.jpg')
+// const metalnessDoorTexture = textureLoader.load('/textures/door/metalness.jpg')
+// const normalDoorTexture = textureLoader.load('/textures/door/normal.jpg')
+// const roughnessDoorTexture = textureLoader.load('/textures/door/roughness.jpg')
 const ambientOcclusionDoorTexture = textureLoader.load('/textures/door/ambientOcclusion.jpg')
-const gradientTexture = textureLoader.load('/textures/gradients/5.jpg')
-const matcapTexture = textureLoader.load('/textures/matcaps/3.png')
-
-gradientTexture.minFilter = THREE.NearestFilter
-gradientTexture.magFilter = THREE.NearestFilter
+// const gradientTexture = textureLoader.load('/textures/gradients/5.jpg')
+// const matcapTexture = textureLoader.load('/textures/matcaps/3.png')
+//
+// gradientTexture.minFilter = THREE.NearestFilter
+// gradientTexture.magFilter = THREE.NearestFilter
 
 /**
  * Base
@@ -43,10 +44,10 @@ const scene = new THREE.Scene()
 // const material = new THREE.MeshNormalMaterial()
 // material.flatShading = true
 
-const material = new THREE.MeshMatcapMaterial()
-material.matcap = matcapTexture
-material.side = THREE.DoubleSide
-material.flatShading = true
+// const material = new THREE.MeshMatcapMaterial()
+// material.matcap = matcapTexture
+// material.side = THREE.DoubleSide
+// material.flatShading = true
 
 // const material = new THREE.MeshDepthMaterial()
 
@@ -63,6 +64,13 @@ material.flatShading = true
 // material.metalness = 0.5
 // material.roughness = 0.5
 
+const material = new THREE.MeshStandardMaterial()
+material.metalness = 0.5
+material.roughness = 0.5
+material.side = THREE.DoubleSide
+material.map = colorDoorTexture
+material.aoMap = ambientOcclusionDoorTexture
+
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
 scene.add(ambientLight)
 
@@ -78,10 +86,18 @@ const sphere = new THREE.Mesh(
     material
 )
 sphere.position.x = -1.5
+sphere.geometry.setAttribute(
+    'uv2',
+    new THREE.BufferAttribute(sphere.geometry.attributes.uv.array, 2)
+)
 
 const plane = new THREE.Mesh(
     new THREE.PlaneBufferGeometry(1, 1),
     material
+)
+plane.geometry.setAttribute(
+    'uv2',
+    new THREE.BufferAttribute(plane.geometry.attributes.uv.array, 2)
 )
 
 const torus = new THREE.Mesh(
@@ -89,6 +105,10 @@ const torus = new THREE.Mesh(
     material
 )
 torus.position.x = 1.5
+torus.geometry.setAttribute(
+    'uv2',
+    new THREE.BufferAttribute(torus.geometry.attributes.uv.array, 2)
+)
 
 scene.add(sphere, plane, torus)
 
@@ -147,13 +167,13 @@ const tick = () =>
     const elapsedTime = clock.getElapsedTime()
 
     // Update Objects
-    sphere.rotation.y = 0.3 * elapsedTime
-    plane.rotation.y = 0.3 * elapsedTime
-    torus.rotation.y = 0.3 * elapsedTime
+    sphere.rotation.y = 0.05 * elapsedTime
+    plane.rotation.y = 0.05 * elapsedTime
+    torus.rotation.y = 0.05 * elapsedTime
 
-    sphere.rotation.x = 0.2 * elapsedTime
-    plane.rotation.x = 0.2 * elapsedTime
-    torus.rotation.x = 0.2 * elapsedTime
+    sphere.rotation.x = 0.07 * elapsedTime
+    plane.rotation.x = 0.07 * elapsedTime
+    torus.rotation.x = 0.07 * elapsedTime
 
     // Update controls
     controls.update()
@@ -166,3 +186,10 @@ const tick = () =>
 }
 
 tick()
+
+/**
+ * GUI
+ */
+const gui = new dat.GUI()
+gui.add(material, 'metalness').min(0).max(1).step(0.001)
+gui.add(material, 'roughness').min(0).max(1).step(0.001)

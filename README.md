@@ -448,9 +448,18 @@ Size , Weight, Data
 -----------
  MATERIALS
 -----------
+
 * MeshBasicMaterial
+* MeshNormalMaterial
+* MeshMatcapMaterial
+* MeshDepthMaterial
+* MeshLambertMaterial (need lights)
+* MeshPhongMaterial (need lights)
+* MeshToonMaterial (need lights)
+
+materials common properties:
 ```js
-const material = new THREE.MeshBasicMaterial()
+const material = new THREE.MeshNormalMaterial()
 material.color = new THREE.Color(0x00ff00)
 material.wireframe = true
 material.side = THREE.DoubleSide  // FrontSide(Default), BackSide, DoubleSide
@@ -458,44 +467,13 @@ material.transparent = true
 material.opacity = 0.7
 material.map = colorDoorTexture
 material.alphaMap = alphaDoorTexture
-```
-
-* MeshNormalMaterial
-```js
-const material = new THREE.MeshNormalMaterial()
 material.flatShading = true
 ```
 
-* MeshMatcapMaterial
-```js
-const material = new THREE.MeshMatcapMaterial()
-material.matcap = matcapTexture
-```
-matcaps resource:
-[https://github.com/nidorx/matcaps](https://github.com/nidorx/matcaps)
-
-* MeshDepthMaterial
-```js
-const material = new THREE.MeshDepthMaterial()
-```
-
-
-* MeshLambertMaterial (need lights)
-```js
-const material = new THREE.MeshLambertMaterial()
-```
-
-* MeshPhongMaterial (need lights)
 ```js
 const material = new THREE.MeshPhongMaterial()
 material.shininess = 100
 material.specular = new THREE.Color(0xff00ff)
-```
-
-* MeshToonMaterial (need lights)
-```js
-const material = new THREE.MeshToonMaterial()
-material.gradientMap = gradientTexture
 ```
 
 Simple Light (just for testing materials):
@@ -508,4 +486,25 @@ pointLight.position.x = 2
 pointLight.position.x = 3
 pointLight.position.x = 4
 scene.add(pointLight)
+```
+
+using AmbientOcclusion by UV2:
+```js
+const textureLoader = new THREE.TextureLoader()
+const ambientOcclusionDoorTexture = textureLoader.load('/textures/door/ambientOcclusion.jpg')
+
+const material = new THREE.MeshStandardMaterial()
+material.metalness = 0.5
+material.roughness = 0.5
+material.map = colorDoorTexture
+material.aoMap = ambientOcclusionDoorTexture
+
+const plane = new THREE.Mesh(
+    new THREE.PlaneBufferGeometry(1, 1),
+    material
+)
+plane.geometry.setAttribute(
+    'uv2',
+    new THREE.BufferAttribute(plane.geometry.attributes.uv.array, 2)
+)
 ```
