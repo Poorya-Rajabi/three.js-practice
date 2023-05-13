@@ -518,3 +518,28 @@ plane.geometry.setAttribute(
     new THREE.BufferAttribute(plane.geometry.attributes.uv.array, 2)
 )
 ```
+
+* environmentMaps
+```js
+const cubeTextureLoader = new THREE.CubeTextureLoader()
+
+const environmentMapsTexture = cubeTextureLoader.load([
+    '/textures/environmentMaps/1/px.jpg',
+    '/textures/environmentMaps/1/nx.jpg',
+    '/textures/environmentMaps/1/py.jpg',
+    '/textures/environmentMaps/1/ny.jpg',
+    '/textures/environmentMaps/1/pz.jpg',
+    '/textures/environmentMaps/1/nz.jpg'
+])
+
+const material = new THREE.MeshStandardMaterial()
+material.metalness = 1
+material.roughness = 0
+material.side = THREE.DoubleSide
+material.envMap = environmentMapsTexture
+```
+
+
+### Where to find environment Maps: </br>
+HDRIs: [https://polyhaven.com/hdris/](https://polyhaven.com/hdris/) </br>
+HTRI to CubeMap: [https://matheowis.github.io/HDRI-to-CubeMap/](https://matheowis.github.io/HDRI-to-CubeMap/) 

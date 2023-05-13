@@ -7,6 +7,8 @@ import * as dat from 'dat.gui'
  * Textures
  */
 const textureLoader = new THREE.TextureLoader()
+const cubeTextureLoader = new THREE.CubeTextureLoader()
+
 const colorDoorTexture = textureLoader.load('/textures/door/color.jpg')
 const alphaDoorTexture = textureLoader.load('/textures/door/alpha.jpg')
 const heightDoorTexture = textureLoader.load('/textures/door/height.jpg')
@@ -15,10 +17,20 @@ const normalDoorTexture = textureLoader.load('/textures/door/normal.jpg')
 const roughnessDoorTexture = textureLoader.load('/textures/door/roughness.jpg')
 const ambientOcclusionDoorTexture = textureLoader.load('/textures/door/ambientOcclusion.jpg')
 // const gradientTexture = textureLoader.load('/textures/gradients/5.jpg')
-// const matcapTexture = textureLoader.load('/textures/matcaps/3.png')
+// const matcapTexture = textureLoader.load('/textures/matcaps/1.png')
 //
 // gradientTexture.minFilter = THREE.NearestFilter
 // gradientTexture.magFilter = THREE.NearestFilter
+
+const environmentMapsTexture = cubeTextureLoader.load([
+    '/textures/environmentMaps/1/px.jpg',
+    '/textures/environmentMaps/1/nx.jpg',
+    '/textures/environmentMaps/1/py.jpg',
+    '/textures/environmentMaps/1/ny.jpg',
+    '/textures/environmentMaps/1/pz.jpg',
+    '/textures/environmentMaps/1/nz.jpg'
+])
+
 
 /**
  * Base
@@ -64,21 +76,27 @@ const scene = new THREE.Scene()
 // material.metalness = 0.5
 // material.roughness = 0.5
 
+// const material = new THREE.MeshStandardMaterial()
+// material.metalness = 0
+// material.roughness = 1
+// material.aoMapIntensity = 1
+// material.side = THREE.DoubleSide
+// material.map = colorDoorTexture
+// material.aoMap = ambientOcclusionDoorTexture
+// material.displacementMap = heightDoorTexture
+// material.displacementScale = 0.05
+// material.metalnessMap = metalnessDoorTexture
+// material.roughnessMap = roughnessDoorTexture
+// material.normalMap = normalDoorTexture
+// material.normalScale.set(0.5, 0.5)
+// material.transparent = true
+// material.alphaMap = alphaDoorTexture
+
 const material = new THREE.MeshStandardMaterial()
-material.metalness = 0
-material.roughness = 1
-material.aoMapIntensity = 1
+material.metalness = 1
+material.roughness = 0
 material.side = THREE.DoubleSide
-material.map = colorDoorTexture
-material.aoMap = ambientOcclusionDoorTexture
-material.displacementMap = heightDoorTexture
-material.displacementScale = 0.05
-material.metalnessMap = metalnessDoorTexture
-material.roughnessMap = roughnessDoorTexture
-material.normalMap = normalDoorTexture
-material.normalScale.set(0.5, 0.5)
-material.transparent = true
-material.alphaMap = alphaDoorTexture
+material.envMap = environmentMapsTexture
 
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
@@ -200,10 +218,10 @@ tick()
 /**
  * GUI
  */
-const gui = new dat.GUI()
+const gui = new dat.GUI({ closed: true })
 gui.add(material, 'metalness').min(0).max(1).step(0.001)
 gui.add(material, 'roughness').min(0).max(1).step(0.001)
-gui.add(material, 'aoMapIntensity').min(0).max(10).step(0.001)
-gui.add(material, 'displacementScale').min(0).max(1).step(0.001)
-gui.add(material.normalScale, 'x').min(0).max(1).step(0.001).name('Normal Scale X')
-gui.add(material.normalScale, 'y').min(0).max(1).step(0.001).name('Normal Scale Y')
+// gui.add(material, 'aoMapIntensity').min(0).max(10).step(0.001)
+// gui.add(material, 'displacementScale').min(0).max(1).step(0.001)
+// gui.add(material.normalScale, 'x').min(0).max(1).step(0.001).name('Normal Scale X')
+// gui.add(material.normalScale, 'y').min(0).max(1).step(0.001).name('Normal Scale Y')
