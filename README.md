@@ -488,16 +488,26 @@ pointLight.position.x = 4
 scene.add(pointLight)
 ```
 
-using AmbientOcclusion by UV2:
+Mesh Standard Material:
 ```js
 const textureLoader = new THREE.TextureLoader()
 const ambientOcclusionDoorTexture = textureLoader.load('/textures/door/ambientOcclusion.jpg')
 
 const material = new THREE.MeshStandardMaterial()
-material.metalness = 0.5
-material.roughness = 0.5
+material.metalness = 0
+material.roughness = 1
+material.aoMapIntensity = 1
+material.side = THREE.DoubleSide
 material.map = colorDoorTexture
 material.aoMap = ambientOcclusionDoorTexture
+material.displacementMap = heightDoorTexture
+material.displacementScale = 0.05
+material.metalnessMap = metalnessDoorTexture
+material.roughnessMap = roughnessDoorTexture
+material.normalMap = normalDoorTexture
+material.normalScale.set(0.5, 0.5)
+material.transparent = true
+material.alphaMap = alphaDoorTexture
 
 const plane = new THREE.Mesh(
     new THREE.PlaneBufferGeometry(1, 1),
