@@ -543,3 +543,40 @@ material.envMap = environmentMapsTexture
 ### Where to find environment Maps: </br>
 HDRIs: [https://polyhaven.com/hdris/](https://polyhaven.com/hdris/) </br>
 HTRI to CubeMap: [https://matheowis.github.io/HDRI-to-CubeMap/](https://matheowis.github.io/HDRI-to-CubeMap/) 
+
+-----------
+ 3D TEXTS
+-----------
+we can convert a font with tools like: [facetype.js](https://gero3.github.io/facetype.js/)
+
+in this case we use three js example font </br>
+check this out: 'node_modules/three/examples/fonts/helvetiker_regular.typeface.json' </br>
+and copy this font to static directory. now you can use it:
+
+```js
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
+
+fontLoader.load(
+    '/fonts/helvetiker_regular.typeface.json',
+    (font) => {
+        const textGeometry = new TextGeometry(
+            'Poorya & Three.js',
+            {
+                font,
+                size: 0.5,
+                height: 0.2,
+                curveSegments: 5,
+                bevelEnabled: true,
+                bevelThickness: 0.03,
+                bevelSize: 0.02,
+                bevelOffset: 0,
+                bevelSegment: 4,
+            }
+        )
+        const textMaterial = new THREE.MeshBasicMaterial({ wireframe: true })
+        const text = new THREE.Mesh(textGeometry, textMaterial)
+        scene.add(text)
+    }
+)
+```
