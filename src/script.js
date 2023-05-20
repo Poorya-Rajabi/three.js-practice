@@ -47,9 +47,15 @@ fontLoader.load(
                 bevelSegment: 4,
             }
         )
+        // move to center
         textGeometry.computeBoundingBox()
-        console.log(textGeometry.boundingBox)
-        // textGeometry.positio
+textGeometry.translate(
+    - (textGeometry.boundingBox.max.x - 0.02) * 0.5,
+    - (textGeometry.boundingBox.max.y - 0.02) * 0.5,
+    - (textGeometry.boundingBox.max.z - 0.03) * 0.5
+)
+        textGeometry.center()
+
         const textMaterial = new THREE.MeshBasicMaterial({ wireframe: true })
         const text = new THREE.Mesh(textGeometry, textMaterial)
         text.position.set(-0.019999999552965164, -0.15952682495117188, -0.029999999329447746)
