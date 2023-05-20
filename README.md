@@ -539,6 +539,8 @@ material.side = THREE.DoubleSide
 material.envMap = environmentMapsTexture
 ```
 
+### Where to find matcaps: </br>
+[https://github.com/nidorx/matcaps](https://github.com/nidorx/matcaps) </br>
 
 ### Where to find environment Maps: </br>
 HDRIs: [https://polyhaven.com/hdris/](https://polyhaven.com/hdris/) </br>

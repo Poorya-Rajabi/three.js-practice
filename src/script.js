@@ -17,13 +17,15 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
-const axesHelper = new THREE.AxesHelper()
-scene.add(axesHelper)
+// const axesHelper = new THREE.AxesHelper()
+// scene.add(axesHelper)
 
 /**
  * Textures
  */
 const textureLoader = new THREE.TextureLoader()
+
+const matcapMaterial = textureLoader.load('/textures/matcaps/6.jpg')
 
 /**
  * Font
@@ -34,7 +36,7 @@ fontLoader.load(
     '/fonts/helvetiker_regular.typeface.json',
     (font) => {
         const textGeometry = new TextGeometry(
-            'Poorya & Three.js',
+            'Three.js',
             {
                 font,
                 size: 0.5,
@@ -47,21 +49,49 @@ fontLoader.load(
                 bevelSegment: 4,
             }
         )
-        // move to center
-        textGeometry.computeBoundingBox()
-textGeometry.translate(
-    - (textGeometry.boundingBox.max.x - 0.02) * 0.5,
-    - (textGeometry.boundingBox.max.y - 0.02) * 0.5,
-    - (textGeometry.boundingBox.max.z - 0.03) * 0.5
-)
         textGeometry.center()
 
-        const textMaterial = new THREE.MeshBasicMaterial({ wireframe: true })
+        const textMaterial = new THREE.MeshMatcapMaterial( {
+            matcap: matcapMaterial,
+            side: THREE.DoubleSide
+        } )
+        // textMaterial.wireframe = true
         const text = new THREE.Mesh(textGeometry, textMaterial)
-        text.position.set(-0.019999999552965164, -0.15952682495117188, -0.029999999329447746)
         scene.add(text)
+
+        createDonuts()
     }
 )
+
+
+
+/**
+ * Donuts
+ */
+function createDonuts() {
+    const donutGeometry = new THREE.TorusBufferGeometry(0.3, 0.2, 20, 45)
+    const donutMaterial = new THREE.MeshMatcapMaterial({ matcap: matcapMaterial, side: THREE.DoubleSide })
+
+    for (let i = 0; i < 100; i++) {
+        const donut = new THREE.Mesh(donutGeometry, donutMaterial)
+        scene.add(donut)
+
+        donut.position.set(
+            (Math.random() - 0.5) * 10,
+            (Math.random() - 0.5) * 10,
+            (Math.random() - 0.5) * 10
+        )
+
+        donut.rotation.set(
+            Math.random() * Math.PI,
+            Math.random() * Math.PI,
+            Math.random() * Math.PI
+        )
+
+        const scale = Math.random()
+        donut.scale.set(scale, scale, scale)
+    }
+}
 
 /**
  * Sizes
