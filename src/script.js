@@ -25,7 +25,11 @@ const scene = new THREE.Scene()
  */
 const textureLoader = new THREE.TextureLoader()
 
-const matcapMaterial = textureLoader.load('/textures/matcaps/6.jpg')
+const matcapMaterial = textureLoader.load('/textures/matcaps/6.png')
+const material = new THREE.MeshMatcapMaterial({
+    matcap: matcapMaterial,
+    side: THREE.DoubleSide
+})
 
 /**
  * Font
@@ -33,10 +37,10 @@ const matcapMaterial = textureLoader.load('/textures/matcaps/6.jpg')
 const fontLoader = new FontLoader()
 
 fontLoader.load(
-    '/fonts/helvetiker_regular.typeface.json',
+    '/fonts/Dancing Script_Regular.json',
     (font) => {
         const textGeometry = new TextGeometry(
-            'Three.js',
+            'Lamb of god',
             {
                 font,
                 size: 0.5,
@@ -50,13 +54,8 @@ fontLoader.load(
             }
         )
         textGeometry.center()
-
-        const textMaterial = new THREE.MeshMatcapMaterial( {
-            matcap: matcapMaterial,
-            side: THREE.DoubleSide
-        } )
         // textMaterial.wireframe = true
-        const text = new THREE.Mesh(textGeometry, textMaterial)
+        const text = new THREE.Mesh(textGeometry, material)
         scene.add(text)
 
         createDonuts()
@@ -68,18 +67,17 @@ fontLoader.load(
 /**
  * Donuts
  */
-function createDonuts() {
-    const donutGeometry = new THREE.TorusBufferGeometry(0.3, 0.2, 20, 45)
-    const donutMaterial = new THREE.MeshMatcapMaterial({ matcap: matcapMaterial, side: THREE.DoubleSide })
+const donutGeometry = new THREE.TorusBufferGeometry(0.3, 0.2, 20, 45)
 
-    for (let i = 0; i < 100; i++) {
-        const donut = new THREE.Mesh(donutGeometry, donutMaterial)
+function createDonuts() {
+    for (let i = 0; i < 300; i++) {
+        const donut = new THREE.Mesh(donutGeometry, material)
         scene.add(donut)
 
         donut.position.set(
-            (Math.random() - 0.5) * 10,
-            (Math.random() - 0.5) * 10,
-            (Math.random() - 0.5) * 10
+            (Math.random() - 0.5) * 15,
+            (Math.random() - 0.5) * 15,
+            (Math.random() - 0.5) * 15
         )
 
         donut.rotation.set(
@@ -122,7 +120,7 @@ window.addEventListener('resize', () =>
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
 camera.position.x = 1
-camera.position.y = 1
+camera.position.y = 0.5
 camera.position.z = 2
 scene.add(camera)
 
