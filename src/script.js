@@ -7,8 +7,7 @@ import * as dat from 'lil-gui'
 /**
  * Base
  */
-// Debug
-const gui = new dat.GUI()
+
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -16,118 +15,77 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
+// Textures
+const textureLoader = new THREE.TextureLoader()
+const simpleShadow = textureLoader.load('/textures/simpleShadow.jpg')
+
+const diffuse = textureLoader.load( 'textures/Carbon.png' );
+diffuse.wrapS = THREE.RepeatWrapping;
+diffuse.wrapT = THREE.RepeatWrapping;
+diffuse.repeat.x = 5;
+diffuse.repeat.y = 5;
+
+const normalMap = textureLoader.load( 'textures/carbon/Carbon_Normal.png' );
+normalMap.wrapS = THREE.RepeatWrapping;
+normalMap.wrapT = THREE.RepeatWrapping;
+normalMap.repeat.x = 5;
+normalMap.repeat.y = 5
+
 /**
  * Lights
  */
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
+const ambientLight = new THREE.AmbientLight(0xffffff, 1)
 scene.add(ambientLight)
 
-const directionalLight = new THREE.DirectionalLight(0x00ffff, 0.3)
-directionalLight.position.set(2.5, 0.25, 0)
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3)
+directionalLight.position.set(0, 3, 0)
 scene.add(directionalLight)
-
-const hemisphereLight = new THREE.HemisphereLight(0xff0000, 0x0000ff, 0.3)
-scene.add(hemisphereLight)
-
-const pointLight = new THREE.PointLight(0xff9000, 0.5, 10, 2)
-pointLight.position.set(1, 1.2, 1)
-scene.add(pointLight)
-
-// * the RectAreaLight only works with MeshStandardMaterial and MeshPhysicalMaterial
-const rectAreaLight = new THREE.RectAreaLight(0x4e00ff, 2, 1, 1)
-rectAreaLight.position.set(-1.5, 0, 1.5)
-rectAreaLight.lookAt(new THREE.Vector3())
-scene.add(rectAreaLight)
-
-const spotLight = new THREE.SpotLight(0x00ff00, 0.5, 10, Math.PI * 0.1, 0.25, 1)
-spotLight.position.set(0, 2, 3)
-scene.add(spotLight)
-
-spotLight.target.position.x = -0.75
-scene.add(spotLight.target)
-
-pointLight.castShadow = true
-
-pointLight.shadow.mapSize.width = 1024
-pointLight.shadow.mapSize.height = 1024
-
-pointLight.shadow.camera.top = 1
-pointLight.shadow.camera.right = 1
-pointLight.shadow.camera.bottom = -1
-pointLight.shadow.camera.left = -1
-
-pointLight.shadow.camera.near = 0.1
-pointLight.shadow.camera.far = 5
-
-pointLight.shadow.radius = 10
-
-const pointLightCameraHelper = new THREE.CameraHelper(pointLight.shadow.camera)
-pointLightCameraHelper.visible = false
-scene.add(pointLightCameraHelper)
 
 /**
  * Helpers
  */
-const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 0.2)
-scene.add(directionalLightHelper)
-
-const hemisphereLightHelper = new THREE.HemisphereLightHelper(hemisphereLight, 0.2)
-scene.add(hemisphereLightHelper)
-
-const pointLightHelper = new THREE.PointLightHelper(pointLight, 0.2)
-scene.add(pointLightHelper)
-
-const spotLightHelper = new THREE.SpotLightHelper(spotLight)
-scene.add(spotLightHelper)
-spotLightHelper.color = new THREE.Color(0x00ff00)
-window.requestAnimationFrame(() => spotLightHelper.update())
-
-const rectAreaLightHelper = new RectAreaLightHelper(rectAreaLight)
-scene.add(rectAreaLightHelper)
-
-gui.add(ambientLight, 'intensity').min(0).max(1).step(0.01)
 
 /**
  * Objects
  */
 // Material
-const material = new THREE.MeshStandardMaterial()
+const material = new THREE.MeshPhysicalMaterial( {
+    color: 0x000ffff,
+    side: THREE.DoubleSide,
+    roughness: 0.5,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.1,
+    map: diffuse,
+    normalMap: normalMap
+} )
 material.roughness = 0.15
-
-gui.add(material, 'roughness').min(0).max(1).step(0.01)
 
 // Objects
 const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(0.5, 32, 32),
+    new THREE.SphereGeometry(0.5, 100, 100),
     material
 )
-sphere.position.x = - 1.5
-
-const cube = new THREE.Mesh(
-    new THREE.BoxGeometry(0.75, 0.75, 0.75),
-    material
-)
-
-const torus = new THREE.Mesh(
-    new THREE.TorusGeometry(0.3, 0.2, 32, 64),
-    material
-)
-torus.position.x = 1.5
 
 const plane = new THREE.Mesh(
     new THREE.PlaneGeometry(5, 5),
     material
 )
 plane.rotation.x = - Math.PI * 0.5
-plane.position.y = - 0.65
+plane.position.y = - 0.5
 
-scene.add(sphere, cube, torus, plane)
+scene.add(sphere, plane)
 
-torus.castShadow = true
-cube.castShadow = true
-sphere.castShadow = true
-plane.receiveShadow = true
-sphere.receiveShadow = true
+const sphereShadow = new THREE.Mesh(
+    new THREE.PlaneBufferGeometry(1, 1),
+    new THREE.MeshBasicMaterial({
+        alphaMap: simpleShadow,
+        transparent: true,
+        color: 0x000000
+    })
+)
+sphereShadow.position.y = plane.position.y + 0.01
+sphereShadow.rotation.x = plane.rotation.x
+scene.add(sphereShadow)
 
 /**
  * Sizes
@@ -175,12 +133,6 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-renderer.shadowMap.enabled = true
-renderer.shadowMap.type = THREE.BasicShadowMap
-// renderer.shadowMap.type = THREE.PCFShadowMap
-// renderer.shadowMap.type = THREE.PCFSoftShadowMap
-// renderer.shadowMap.type = THREE.VSMShadowMap
-
 /**
  * Animate
  */
@@ -190,14 +142,13 @@ const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
 
-    // Update objects
-    sphere.rotation.y = 0.1 * elapsedTime
-    cube.rotation.y = 0.1 * elapsedTime
-    torus.rotation.y = 0.1 * elapsedTime
-
-    sphere.rotation.x = 0.15 * elapsedTime
-    cube.rotation.x = 0.15 * elapsedTime
-    torus.rotation.x = 0.15 * elapsedTime
+    // Update sphere
+    sphere.position.x = Math.sin(elapsedTime) * 1.5
+    sphere.position.z = Math.cos(elapsedTime) * 1.5
+    sphere.position.y = Math.abs(Math.sin(elapsedTime * 3))
+    sphereShadow.position.x = sphere.position.x
+    sphereShadow.position.z = sphere.position.z
+    sphereShadow.material.opacity = (1 - sphere.position.y) * 0.8
 
     // Update controls
     controls.update()
