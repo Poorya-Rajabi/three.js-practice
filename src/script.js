@@ -30,7 +30,7 @@ const hemisphereLight = new THREE.HemisphereLight(0xff0000, 0x0000ff, 0.3)
 scene.add(hemisphereLight)
 
 const pointLight = new THREE.PointLight(0xff9000, 0.5, 10, 2)
-pointLight.position.set(1, -0.5, 1)
+pointLight.position.set(1, 1.2, 1)
 scene.add(pointLight)
 
 // * the RectAreaLight only works with MeshStandardMaterial and MeshPhysicalMaterial
@@ -46,6 +46,24 @@ scene.add(spotLight)
 spotLight.target.position.x = -0.75
 scene.add(spotLight.target)
 
+pointLight.castShadow = true
+
+pointLight.shadow.mapSize.width = 1024
+pointLight.shadow.mapSize.height = 1024
+
+pointLight.shadow.camera.top = 1
+pointLight.shadow.camera.right = 1
+pointLight.shadow.camera.bottom = -1
+pointLight.shadow.camera.left = -1
+
+pointLight.shadow.camera.near = 0.1
+pointLight.shadow.camera.far = 5
+
+pointLight.shadow.radius = 10
+
+const pointLightCameraHelper = new THREE.CameraHelper(pointLight.shadow.camera)
+pointLightCameraHelper.visible = false
+scene.add(pointLightCameraHelper)
 
 /**
  * Helpers
@@ -105,6 +123,12 @@ plane.position.y = - 0.65
 
 scene.add(sphere, cube, torus, plane)
 
+torus.castShadow = true
+cube.castShadow = true
+sphere.castShadow = true
+plane.receiveShadow = true
+sphere.receiveShadow = true
+
 /**
  * Sizes
  */
@@ -150,6 +174,12 @@ const renderer = new THREE.WebGLRenderer({
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+renderer.shadowMap.enabled = true
+renderer.shadowMap.type = THREE.BasicShadowMap
+// renderer.shadowMap.type = THREE.PCFShadowMap
+// renderer.shadowMap.type = THREE.PCFSoftShadowMap
+// renderer.shadowMap.type = THREE.VSMShadowMap
 
 /**
  * Animate

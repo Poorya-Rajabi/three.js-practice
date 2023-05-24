@@ -636,7 +636,7 @@ min cost: AmbientLight & HemisphereLight
 moderest cost: DirectionalLight & PointLight
 hight cost: SpotLight & RectAreaLight
 
-### helpers
+### Helpers
 ```js
 const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 0.2)
 scene.add(directionalLightHelper)
@@ -655,4 +655,45 @@ window.requestAnimationFrame(() => spotLightHelper.update())
 import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper.js'
 const rectAreaLightHelper = new RectAreaLightHelper(rectAreaLight)
 scene.add(rectAreaLightHelper)
+```
+
+-----------
+ SHADOWS
+-----------
+
+just working on:
+directionalLight, spotLight and pointLight
+```js
+directionalLight.castShadow = true
+
+directionalLight.shadow.mapSize.width = 1024
+directionalLight.shadow.mapSize.height = 1024
+
+directionalLight.shadow.camera.top = 1
+directionalLight.shadow.camera.right = 1
+directionalLight.shadow.camera.bottom = -1
+directionalLight.shadow.camera.left = -1
+
+directionalLight.shadow.camera.near = 0.1
+directionalLight.shadow.camera.far = 5
+
+plane.receiveShadow = true
+cube.castShadow = true
+
+renderer.shadowMap.enabled = true
+```
+### Camera Helpers:
+```js
+const pointLightCameraHelper = new THREE.CameraHelper(pointLight.shadow.camera)
+scene.add(pointLightCameraHelper)
+```
+
+### Shadows Algorithms:
+* THREE.BasicShadowMap // best performance but lousy quality
+* THREE.PCFShadowMap (default) // less performance but smoother edges
+* THREE.PCFSoftShadowMap // less performance but even softer edges
+* THREE.VSMShadowMap // less performance, more constraints, can have unexpected results
+```js
+renderer.shadowMap.enabled = true
+renderer.shadowMap.type = THREE.BasicShadowMap
 ```
