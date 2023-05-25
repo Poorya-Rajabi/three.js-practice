@@ -677,6 +677,8 @@ directionalLight.shadow.camera.left = -1
 directionalLight.shadow.camera.near = 0.1
 directionalLight.shadow.camera.far = 5
 
+directionalLight.shadow.radius = 10
+
 plane.receiveShadow = true
 cube.castShadow = true
 
@@ -696,4 +698,21 @@ scene.add(pointLightCameraHelper)
 ```js
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.BasicShadowMap
+```
+
+-----------
+ OTHERS
+-----------
+### GROUP
+```js
+const group = new THREE.Group()
+scene.add(group)
+
+group.add(obj1, obj2, ...)
+```
+
+### FOG
+```js
+const fog = new THREE.Fog(0x262837, 1, 16)
+scene.fog = fog
 ```
