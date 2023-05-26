@@ -2,6 +2,7 @@ import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import {ConeBufferGeometry, PCFSoftShadowMap} from "three";
+import gsap from 'gsap'
 
 /**
  * Base
@@ -235,10 +236,12 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.x = 4
-camera.position.y = 2
-camera.position.z = 5
+camera.position.x = -5
+camera.position.y = 1
+camera.position.z = 10
 scene.add(camera)
+
+gsap.to(camera.position, { duration: 3, delay: 1, x: 4, y: 2, z: 5 })
 
 // Controls
 const controls = new OrbitControls(camera, canvas)

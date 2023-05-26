@@ -153,13 +153,13 @@ const camera = new THREE.OrthographicCamera( -1 * aspect, aspect, -1, 1, 0.1, 10
  CONTROLS
 ----------
 * DeviceOrientationControls: mobile gyroscope (deprecated!)
-* flyControls: enables a navigation similar to fly modes in DCC tools like Blender.
-* firstPersonControl: is like FlyControl, but with a fixed-up axis. (birds & game)
-* pointerLockControl: change camera by mouse  (Counter-Strike game), is a perfect choice for first person 3D games.
-* orbitControl: similar to the controls we made with more features (simon website)
-* trackableControl: like orbitControl without the vertical angle limit
-* transformControl: changes objects position
-* dargControl: can be used to provide a drag'n'drop interaction.
+* FlyControls: enables a navigation similar to fly modes in DCC tools like Blender.
+* FirstPersonControls: is like FlyControl, but with a fixed-up axis. (birds & game)
+* PointerLockControls: change camera by mouse  (Counter-Strike game), is a perfect choice for first person 3D games.
+* OrbitControls: similar to the controls we made with more features (simon website)
+* TrackballControls : like orbitControl without the vertical angle limit
+* TransformControls: changes objects position
+* DragControls: can be used to provide a drag'n'drop interaction.
 
 ```js
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
