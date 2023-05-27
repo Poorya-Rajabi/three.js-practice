@@ -369,6 +369,7 @@ Github repository: [dataarts/dat.gui](https://github.com/dataarts/dat.gui)
 TEXTURES
 ----------
 * textures resources: <br />
+[https://ambientcg.com/](https://ambientcg.com/) <br />
 [https://3dtextures.me](https://3dtextures.me) <br />
 [https://www.poliigon.com](https://www.poliigon.com/) <br />
 [https://www.arroway-textures.ch/](https://www.arroway-textures.ch/) <br />
