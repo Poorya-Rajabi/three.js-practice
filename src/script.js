@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import {ConeBufferGeometry, PCFSoftShadowMap} from "three";
 import gsap from 'gsap'
+import {cross} from "three/examples/jsm/renderers/nodes/ShaderNode";
 
 /**
  * Base
@@ -222,6 +223,51 @@ for(let i = 0; i < 50; i++) {
     grave.castShadow = true
 }
 
+// Trees
+const trees = new THREE.Group()
+scene.add(trees)
+
+for(let i = 0; i < 20; i++) {
+    const angle = Math.random() * Math.PI * 2
+    const radius = 4.5 + Math.random() * 5.5
+    const x = Math.sin(angle) * radius
+    const z = Math.cos(angle) * radius
+
+    const tree = new THREE.Mesh(bushGeometry, bushMaterial)
+    const random = Math.max(Math.min(Math.random(), 0.5), 0.3)
+    tree.position.set(x, random / 2, z)
+    tree.scale.set(random, random, random)
+    tree.castShadow = true
+    trees.add(tree)
+}
+
+// cross
+const crosses = new THREE.Group()
+scene.add(crosses)
+
+const crossGeometry1 = new THREE.BoxBufferGeometry(0.1, 0.75, 0.1)
+const crossGeometry2 = new THREE.BoxBufferGeometry(0.35, 0.1, 0.099)
+
+for(let i = 0; i < 30; i++) {
+    const angle = Math.random() * Math.PI * 2
+    const radius = 4.5 + Math.random() * 5.5
+    const x = Math.sin(angle) * radius
+    const z = Math.cos(angle) * radius
+
+    const cross = new THREE.Group()
+    crosses.add(cross)
+
+    const cross1 = new THREE.Mesh(crossGeometry1, graveMaterial)
+    const cross2 = new THREE.Mesh(crossGeometry2, graveMaterial)
+    cross2.position.y = 0.15
+    cross.add(cross1, cross2)
+    cross.position.set(x, 0.225, z)
+    cross.rotation.y = Math.random() * Math.PI
+    cross1.castShadow = true
+    cross2.castShadow = true
+}
+
+
 /**
  * Lights
  */
@@ -242,13 +288,13 @@ house.add(doorLight)
 /**
  * Ghosts
  */
-const ghost1 = new THREE.PointLight(0xff00ff, 2, 3)
+const ghost1 = new THREE.PointLight(0xff0000, 2, 3)
 scene.add(ghost1)
 
-const ghost2 = new THREE.PointLight(0x00ffff, 2, 3)
+const ghost2 = new THREE.PointLight(0xff0000, 2, 3)
 scene.add(ghost2)
 
-const ghost3 = new THREE.PointLight(0xffff00, 2, 3)
+const ghost3 = new THREE.PointLight(0xff0000, 2, 3)
 scene.add(ghost3)
 
 /**
