@@ -21,35 +21,47 @@ const scene = new THREE.Scene()
  */
 const textureLoader = new THREE.TextureLoader()
 
-const particlesLoader = textureLoader.load('/textures/particles/3.png')
+const particlesLoader = textureLoader.load('/textures/particles/2.png')
+const x = textureLoader.load('/textures/bush/color.jpg')
 
 /**
  * Particles
  */
-// const ParticlesGeometry = new THREE.SphereBufferGeometry(1, 32, 32)
-const ParticlesGeometry = new THREE.BufferGeometry()
-const count = 5000
+// const particlesGeometry = new THREE.SphereBufferGeometry(1, 32, 32)
+const particlesGeometry = new THREE.BufferGeometry()
+const count = 20000
+
 const positions = new Float32Array(count * 3)
+const colors = new Float32Array(count * 3)
+
 for (let i = 0; i < count * 3; i++) {
     positions[i] = (Math.random() - 0.5) * 10
+    colors[i] = Math.random()
 }
-ParticlesGeometry.setAttribute(
+particlesGeometry.setAttribute(
     'position',
     new THREE.BufferAttribute(positions, 3)
 )
-const ParticlesMaterial = new THREE.PointsMaterial({
-    size: 0.05,
+particlesGeometry.setAttribute(
+    'color',
+    new THREE.BufferAttribute(colors, 3)
+)
+const particlesMaterial = new THREE.PointsMaterial({
+    size: 0.1,
     sizeAttenuation: true,
-    // map: particlesLoader,
-    color: 'pink',
+    // color: 'pink',
     transparent: true,
     alphaMap: particlesLoader,
-    alphaTest: 0.001
+    // alphaTest: 0.001,
+    // depthTest: false,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending, // need depthWrite - (bad performance),
+    vertexColors: true
 })
-const particles = new THREE.Points(ParticlesGeometry, ParticlesMaterial)
+const particles = new THREE.Points(particlesGeometry, particlesMaterial)
 scene.add(particles)
 
-gsap.to(particles.position, { delay: 1, duration: 1000, y: -100, x: 100 })
+// gsap.to(particles.position, { delay: 1, duration: 1000, y: -100, x: 100 })
 
 
 /**
@@ -104,6 +116,15 @@ const clock = new THREE.Clock()
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
+
+    // Update particles
+    for(let i = 0; i < count; i++) {
+        const i3 = i * 3
+
+        const x = particlesGeometry.attributes.position.array[i3]
+        particlesGeometry.attributes.position.array[i3 + 1] = Math.sin(elapsedTime + x)
+    }
+    particlesGeometry.attributes.position.needsUpdate = true
 
     // Update controls
     controls.update()

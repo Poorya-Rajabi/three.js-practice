@@ -720,7 +720,7 @@ scene.add(particles)
 ```js
 const ParticlesGeometry = new THREE.BufferGeometry()
 const count = 5000
-const positions = new Float32Array(count * 3)
+const positions = new Float32Array(count * 3) // 3 => (x, y, z)
 for (let i = 0; i < count * 3; i++) {
     positions[i] = (Math.random() - 0.5) * 10
 }
@@ -734,6 +734,93 @@ const ParticlesMaterial = new THREE.PointsMaterial({
 })
 const particles = new THREE.Points(ParticlesGeometry, ParticlesMaterial)
 scene.add(particles)
+```
+
+### fading textures techniques:
+```js
+ParticlesMaterial.alphaTest = 0.001
+// OR
+ParticlesMaterial.depthTest = false
+// OR
+ParticlesMaterial.depthWrite = false (best solution)
+```
+
+### Blending:
+```js
+ParticlesMaterial.depthWrite = false
+ParticlesMaterial.blending = THREE.AdditiveBlending
+```
+
+### Set random colors to material:
+```js
+const colors = new Float32Array(count * 3) // 3 => (R, G, B)
+
+for (let i = 0; i < count * 3; i++) {
+    positions[i] = (Math.random() - 0.5) * 10
+    colors[i] = Math.random()
+}
+
+ParticlesGeometry.setAttribute(
+    'color',
+    new THREE.BufferAttribute(colors, 3)
+)
+
+const ParticlesMaterial = new THREE.PointsMaterial({
+    ...
+    vertexColors: true
+})
+```
+### Animation
+* all of particle:
+```js
+const clock = new THREE.Clock()
+
+const tick = () =>
+{
+    const elapsedTime = clock.getElapsedTime()
+
+    // Update particles
+    particles.rotation.y = elapsedTime * 0.2 // position / scale / rotation
+
+    // Update controls
+    controls.update()
+
+    // Render
+    renderer.render(scene, camera)
+
+    // Call tick again on the next frame
+    window.requestAnimationFrame(tick)
+}
+```
+* particlesGeometry:
+```js
+const clock = new THREE.Clock()
+
+const tick = () =>
+{
+    const elapsedTime = clock.getElapsedTime()
+
+    // Update particles (bad performance)
+    for(let i = 0; i < count; i++) {
+        const i3 = i * 3 // (x, y, z)
+        // i3 + 0 => x
+        // i3 + 1 => y
+        // i3 + 2 => z
+
+        const x = particlesGeometry.attributes.position.array[i3] // i3 === i3 + 0 => x
+        particlesGeometry.attributes.position.array[i3 + 1] = Math.sin(elapsedTime + x)
+    }
+    particlesGeometry.attributes.position.needsUpdate = true
+
+    // Update controls
+    controls.update()
+
+    // Render
+    renderer.render(scene, camera)
+
+    // Call tick again on the next frame
+    window.requestAnimationFrame(tick)
+}
 ```
 
 ### Where to find Particles: </br>
