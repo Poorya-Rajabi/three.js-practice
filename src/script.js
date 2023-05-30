@@ -22,7 +22,6 @@ const scene = new THREE.Scene()
 const textureLoader = new THREE.TextureLoader()
 
 const particlesLoader = textureLoader.load('/textures/particles/2.png')
-const x = textureLoader.load('/textures/bush/color.jpg')
 
 /**
  * Particles
