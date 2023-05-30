@@ -702,6 +702,45 @@ renderer.shadowMap.type = THREE.BasicShadowMap
 ```
 
 -----------
+ PARTICLES
+-----------
+
+### Built-in Geometries:
+```js
+const ParticlesGeometry = new THREE.SphereBufferGeometry(1, 32, 32)
+const ParticlesMaterial = new THREE.PointsMaterial({
+    size: 0.02,
+    sizeAttenuation: true
+})
+const particles = new THREE.Points(ParticlesGeometry, ParticlesMaterial)
+scene.add(particles)
+```
+
+### Custom Geometries:
+```js
+const ParticlesGeometry = new THREE.BufferGeometry()
+const count = 5000
+const positions = new Float32Array(count * 3)
+for (let i = 0; i < count * 3; i++) {
+    positions[i] = (Math.random() - 0.5) * 10
+}
+ParticlesGeometry.setAttribute(
+    'position',
+    new THREE.BufferAttribute(positions, 3)
+)
+const ParticlesMaterial = new THREE.PointsMaterial({
+    size: 0.02,
+    sizeAttenuation: true
+})
+const particles = new THREE.Points(ParticlesGeometry, ParticlesMaterial)
+scene.add(particles)
+```
+
+### Where to find Particles: </br>
+[https://kenney.nl/assets/particle-pack](https://kenney.nl/assets/particle-pack) </br>
+
+
+-----------
  OTHERS
 -----------
 ### GROUP
