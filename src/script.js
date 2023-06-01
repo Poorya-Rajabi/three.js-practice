@@ -2,13 +2,12 @@ import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'lil-gui'
-import gsap from 'gsap'
 
 /**
  * Base
  */
 // Debug
-const gui = new dat.GUI()
+const gui = new dat.GUI( { width: 400 } )
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -17,50 +16,77 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
 /**
- * Textures
+ * Galaxy
  */
-const textureLoader = new THREE.TextureLoader()
-
-const particlesLoader = textureLoader.load('/textures/particles/2.png')
-
-/**
- * Particles
- */
-// const particlesGeometry = new THREE.SphereBufferGeometry(1, 32, 32)
-const particlesGeometry = new THREE.BufferGeometry()
-const count = 20000
-
-const positions = new Float32Array(count * 3)
-const colors = new Float32Array(count * 3)
-
-for (let i = 0; i < count * 3; i++) {
-    positions[i] = (Math.random() - 0.5) * 10
-    colors[i] = Math.random()
+const parameters = {
+    count: 10000,
+    size: 0.01,
+    radius: 5,
+    branches: 3,
+    spin: 1,
+    randomness: 0.2,
+    randomnessPower: 3
 }
-particlesGeometry.setAttribute(
-    'position',
-    new THREE.BufferAttribute(positions, 3)
-)
-particlesGeometry.setAttribute(
-    'color',
-    new THREE.BufferAttribute(colors, 3)
-)
-const particlesMaterial = new THREE.PointsMaterial({
-    size: 0.1,
-    sizeAttenuation: true,
-    // color: 'pink',
-    transparent: true,
-    alphaMap: particlesLoader,
-    // alphaTest: 0.001,
-    // depthTest: false,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending, // need depthWrite - (bad performance),
-    vertexColors: true
-})
-const particles = new THREE.Points(particlesGeometry, particlesMaterial)
-scene.add(particles)
+let geometry = null
+let material = null
+let points = null
 
-// gsap.to(particles.position, { delay: 1, duration: 1000, y: -100, x: 100 })
+const galaxyGenerator = () => {
+    if(geometry !== null) {
+        geometry.dispose()
+        material.dispose()
+        scene.remove(points)
+    }
+
+    console.log('galaxyGenerator')
+    // Geometry
+    geometry = new THREE.BufferGeometry()
+
+    const positions = new Float32Array(parameters.count * 3)
+
+    for(let i = 0; i < parameters.count; i++) {
+        const i3 = i * 3
+
+        const radius = Math.random() * parameters.radius
+        const spinAngle = radius * parameters.spin
+        const branchAngle = (i % parameters.branches) / parameters.branches * Math.PI * 2
+
+        const randomX = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1)
+        const randomY = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1)
+        const randomZ = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1)
+
+        positions[i3] = Math.sin(branchAngle + spinAngle) * radius + randomX
+        positions[i3 + 1] = randomY
+        positions[i3 + 2] = Math.cos(branchAngle + spinAngle) * radius + randomZ
+    }
+
+    geometry.setAttribute(
+        'position',
+        new THREE.BufferAttribute(positions, 3)
+    )
+
+    //Material
+    material = new THREE.PointsMaterial({
+        size: parameters.size,
+        color: 0x00ffff,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+    })
+
+    // Points
+    points = new THREE.Points(geometry, material)
+    scene.add(points)
+}
+
+galaxyGenerator()
+
+gui.add(parameters, 'count').min(100).max(1000000).step(100).onFinishChange(galaxyGenerator)
+gui.add(parameters, 'size').min(0.001).max(0.1).step(0.001).onFinishChange(galaxyGenerator)
+gui.add(parameters, 'radius').min(0).max(20).step(0.01).onFinishChange(galaxyGenerator)
+gui.add(parameters, 'branches').min(2).max(20).step(1).onFinishChange(galaxyGenerator)
+gui.add(parameters, 'spin').min(-5).max(5).step(0.001).onFinishChange(galaxyGenerator)
+gui.add(parameters, 'randomness').min(0).max(2).step(0.001).onFinishChange(galaxyGenerator)
+gui.add(parameters, 'randomnessPower').min(1).max(10).step(0.001).onFinishChange(galaxyGenerator)
 
 
 /**
@@ -91,6 +117,8 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
+camera.position.x = 3
+camera.position.y = 3
 camera.position.z = 3
 scene.add(camera)
 
@@ -115,15 +143,6 @@ const clock = new THREE.Clock()
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
-
-    // Update particles
-    for(let i = 0; i < count; i++) {
-        const i3 = i * 3
-
-        const x = particlesGeometry.attributes.position.array[i3]
-        particlesGeometry.attributes.position.array[i3 + 1] = Math.sin(elapsedTime + x)
-    }
-    particlesGeometry.attributes.position.needsUpdate = true
 
     // Update controls
     controls.update()
