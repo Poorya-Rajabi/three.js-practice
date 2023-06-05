@@ -34,10 +34,10 @@ let geometry = null
 let material = null
 let points = null
 
-const insideColor = new THREE.Color(parameters.insideColor)
-const outsideColor = new THREE.Color(parameters.outsideColor)
-
 const galaxyGenerator = () => {
+    const insideColor = new THREE.Color(parameters.insideColor)
+    const outsideColor = new THREE.Color(parameters.outsideColor)
+
     if(geometry !== null) {
         geometry.dispose()
         material.dispose()
