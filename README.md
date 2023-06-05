@@ -13,7 +13,7 @@ npm run build
 ```
 
 ## Demo
-You can try out by clicking on this [Demo Link](https://aquamarine-crisp-802505.netlify.app/).
+You can try out by clicking on this [Demo Link](https://poorya-hh.netlify.app/).
 
 -----------
 three.js important topics - (just an example from each topic):
@@ -771,7 +771,7 @@ const ParticlesMaterial = new THREE.PointsMaterial({
 })
 ```
 ### Animation
-* all of particle:
+* all of particles together:
 ```js
 const clock = new THREE.Clock()
 
@@ -823,14 +823,14 @@ const tick = () =>
 }
 ```
 
-### Where to find Particles: </br>
+### Where to find Particle textures: </br>
 [https://kenney.nl/assets/particle-pack](https://kenney.nl/assets/particle-pack) </br>
 
 
 -----------
  OTHERS
 -----------
-### GROUP
+### Group
 ```js
 const group = new THREE.Group()
 scene.add(group)
@@ -838,8 +838,19 @@ scene.add(group)
 group.add(obj1, obj2, ...)
 ```
 
-### FOG
+### Fog
 ```js
 const fog = new THREE.Fog(0x262837, 1, 16)
 scene.fog = fog
+
+renderer.setClearColor(0x262837) // fog color
+```
+
+### Gradient Color
+```js
+const insideColor = new THREE.Color('#ff6030')
+const outsideColor = new THREE.Color('#1b3948')
+
+const mixedColor = insideColor.clone()
+mixedColor.lerp(outsideColor, alpha) // alpha: 0 to 1
 ```
