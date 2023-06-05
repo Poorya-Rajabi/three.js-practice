@@ -845,3 +845,12 @@ scene.fog = fog
 
 renderer.setClearColor(0x262837) // fog color
 ```
+
+### Gradient Color
+```js
+const insideColor = new THREE.Color('#ff6030')
+const outsideColor = new THREE.Color('#1b3948')
+
+const mixedColor = insideColor.clone()
+mixedColor.lerp(outsideColor, alpha) // alpha: 0 to 1
+```
