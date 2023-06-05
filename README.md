@@ -15,7 +15,7 @@ npm run build
 ## Demo
 You can try out by clicking on this demo links:
 [Haunted House](https://poorya-hh.netlify.app/)
-[Galaxy](vercel.com/poorya-rajabi/galaxy)
+[Galaxy](https://galaxy-lovcqwrdn-poorya-rajabi.vercel.app/)
 
 -----------
 three.js important topics - (just an example from each topic):
