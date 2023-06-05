@@ -2,7 +2,6 @@ import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'lil-gui'
-import gsap from 'gsap'
 
 /**
  * Base
@@ -17,103 +16,37 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
 /**
- * Galaxy
+ * Objects
  */
-const parameters = {
-    count: 10000,
-    size: 0.01,
-    radius: 5,
-    branches: 3,
-    spin: 2,
-    randomness: 0.5,
-    randomnessPower: 3.5,
-    insideColor: '#ff6030',
-    outsideColor: '#1b3948'
-}
-let geometry = null
-let material = null
-let points = null
+const object1 = new THREE.Mesh(
+    new THREE.SphereGeometry(0.5, 16, 16),
+    new THREE.MeshBasicMaterial({ color: '#ff0000' })
+)
+object1.position.x = - 2
 
-const galaxyGenerator = () => {
-    const insideColor = new THREE.Color(parameters.insideColor)
-    const outsideColor = new THREE.Color(parameters.outsideColor)
+const object2 = new THREE.Mesh(
+    new THREE.SphereGeometry(0.5, 16, 16),
+    new THREE.MeshBasicMaterial({ color: '#ff0000' })
+)
 
-    if(geometry !== null) {
-        geometry.dispose()
-        material.dispose()
-        scene.remove(points)
-    }
+const object3 = new THREE.Mesh(
+    new THREE.SphereGeometry(0.5, 16, 16),
+    new THREE.MeshBasicMaterial({ color: '#ff0000' })
+)
+object3.position.x = 2
 
-    console.log('galaxyGenerator')
-    // Geometry
-    geometry = new THREE.BufferGeometry()
+scene.add(object1, object2, object3)
 
-    const positions = new Float32Array(parameters.count * 3)
-    const colors = new Float32Array(parameters.count * 3)
+/**
+ * Raycaster
+ */
+const raycaster = new THREE.Raycaster()
+let currentIntersect = null
+const rayOrigin = new THREE.Vector3(- 3, 0, 0)
+const rayDirection = new THREE.Vector3(10, 0, 0)
+rayDirection.normalize()
 
-    for(let i = 0; i < parameters.count; i++) {
-        const i3 = i * 3
-
-        // Positions
-        const radius = Math.random() * parameters.radius
-        const spinAngle = radius * parameters.spin
-        const branchAngle = (i % parameters.branches) / parameters.branches * Math.PI * 2
-
-        const randomX = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness
-        const randomY = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness
-        const randomZ = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness
-
-        positions[i3    ] = Math.sin(branchAngle + spinAngle) * radius + randomX
-        positions[i3 + 1] = randomY
-        positions[i3 + 2] = Math.cos(branchAngle + spinAngle) * radius + randomZ
-
-        // Colors
-        const mixedColor = insideColor.clone()
-        mixedColor.lerp(outsideColor, radius / parameters.radius)
-
-        colors[i3    ] = mixedColor.r
-        colors[i3 + 1] = mixedColor.g
-        colors[i3 + 2] = mixedColor.b
-    }
-
-    geometry.setAttribute(
-        'position',
-        new THREE.BufferAttribute(positions, 3)
-    )
-
-    geometry.setAttribute(
-        'color',
-        new THREE.BufferAttribute(colors, 3)
-    )
-
-    //Material
-    material = new THREE.PointsMaterial({
-        size: parameters.size,
-        sizeAttenuation: true,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-        vertexColors: true
-    })
-
-    // Points
-    points = new THREE.Points(geometry, material)
-    scene.add(points)
-
-    // Animation
-    gsap.to(points.rotation, { duration: 100, ease: 'none', repeat: -1, y: Math.PI * 2 })
-}
-
-galaxyGenerator()
-
-gui.add(parameters, 'count').min(100).max(1000000).step(100).onFinishChange(galaxyGenerator)
-gui.add(parameters, 'size').min(0.001).max(0.1).step(0.001).onFinishChange(galaxyGenerator)
-gui.add(parameters, 'radius').min(0).max(20).step(0.01).onFinishChange(galaxyGenerator)
-gui.add(parameters, 'branches').min(2).max(20).step(1).onFinishChange(galaxyGenerator)
-gui.add(parameters, 'spin').min(-5).max(5).step(0.001).onFinishChange(galaxyGenerator)
-gui.add(parameters, 'randomness').min(0).max(2).step(0.001).onFinishChange(galaxyGenerator)
-gui.add(parameters, 'randomnessPower').min(1).max(10).step(0.001).onFinishChange(galaxyGenerator)
-gui.addColor(parameters, 'insideColor').onFinishChange(galaxyGenerator)
-gui.addColor(parameters, 'outsideColor').onFinishChange(galaxyGenerator)
+// raycaster.set(rayOrigin, rayDirection)
 
 /**
  * Sizes
@@ -139,12 +72,42 @@ window.addEventListener('resize', () =>
 })
 
 /**
+ * Mouse
+ */
+const mouse = new THREE.Vector2()
+
+window.addEventListener('mousemove', (event) =>
+{
+    mouse.x = event.clientX / sizes.width * 2 - 1
+    mouse.y = - (event.clientY / sizes.height) * 2 + 1
+})
+
+window.addEventListener('click', () =>
+{
+    if(currentIntersect)
+    {
+        switch(currentIntersect.object)
+        {
+            case object1:
+                console.log('click on object 1')
+                break
+
+            case object2:
+                console.log('click on object 2')
+                break
+
+            case object3:
+                console.log('click on object 3')
+                break
+        }
+    }
+})
+
+/**
  * Camera
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.x = 3
-camera.position.y = 3
 camera.position.z = 3
 scene.add(camera)
 
@@ -169,6 +132,75 @@ const clock = new THREE.Clock()
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
+
+    // Animate objects
+    object1.position.y = Math.sin(elapsedTime * 0.3) * 1.5
+    object2.position.y = Math.sin(elapsedTime * 0.8) * 1.5
+    object3.position.y = Math.sin(elapsedTime * 1.4) * 1.5
+
+    // Cast a fixed ray
+    // const rayOrigin = new THREE.Vector3(- 3, 0, 0)
+    // const rayDirection = new THREE.Vector3(1, 0, 0)
+    // rayDirection.normalize()
+
+    // raycaster.set(rayOrigin, rayDirection)
+
+    // const objectsToTest = [object1, object2, object3]
+    // const intersects = raycaster.intersectObjects(objectsToTest)
+
+    // for(const object of objectsToTest)
+    // {
+    //     object.material.color.set('#ff0000')
+    // }
+
+    // for(const intersect of intersects)
+    // {
+    //     intersect.object.material.color.set('#0000ff')
+    // }
+
+    // Cast a ray from the mouse
+    // raycaster.setFromCamera(mouse, camera)
+
+    // const objectsToTest = [object1, object2, object3]
+    // const intersects = raycaster.intersectObjects(objectsToTest)
+
+    // for(const intersect of intersects)
+    // {
+    //     intersect.object.material.color.set('#0000ff')
+    // }
+
+    // for(const object of objectsToTest)
+    // {
+    //     if(!intersects.find(intersect => intersect.object === object))
+    //     {
+    //         object.material.color.set('#ff0000')
+    //     }
+    // }
+
+    // Cast a ray from the mouse and handle events
+    raycaster.setFromCamera(mouse, camera)
+
+    const objectsToTest = [object1, object2, object3]
+    const intersects = raycaster.intersectObjects(objectsToTest)
+
+    if(intersects.length)
+    {
+        if(!currentIntersect)
+        {
+            console.log('mouse enter')
+        }
+
+        currentIntersect = intersects[0]
+    }
+    else
+    {
+        if(currentIntersect)
+        {
+            console.log('mouse leave')
+        }
+
+        currentIntersect = null
+    }
 
     // Update controls
     controls.update()
