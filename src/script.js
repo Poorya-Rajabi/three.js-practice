@@ -20,11 +20,11 @@ const scene = new THREE.Scene()
  * Galaxy
  */
 const parameters = {
-    count: 10000,
+    count: 50000,
     size: 0.01,
     radius: 5,
     branches: 3,
-    spin: 2,
+    spin: 2.5,
     randomness: 0.5,
     randomnessPower: 3.5,
     insideColor: '#ff6030',
@@ -64,7 +64,7 @@ const galaxyGenerator = () => {
         const randomZ = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness
 
         positions[i3    ] = Math.sin(branchAngle + spinAngle) * radius + randomX
-        positions[i3 + 1] = randomY
+        positions[i3 + 1] = randomY * Math.cos(radius) * radius / 2
         positions[i3 + 2] = Math.cos(branchAngle + spinAngle) * radius + randomZ
 
         // Colors
@@ -100,7 +100,7 @@ const galaxyGenerator = () => {
     scene.add(points)
 
     // Animation
-    gsap.to(points.rotation, { duration: 100, ease: 'none', repeat: -1, y: Math.PI * 2 })
+    gsap.to(points.rotation, { duration: 100, ease: 'none', repeat: -1, y: -Math.PI * 2 })
 }
 
 galaxyGenerator()
@@ -144,7 +144,7 @@ window.addEventListener('resize', () =>
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
 camera.position.x = 3
-camera.position.y = 3
+camera.position.y = 2
 camera.position.z = 3
 scene.add(camera)
 
