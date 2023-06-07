@@ -77,17 +77,17 @@ cube.position.normalize() // object comes to distance(1) from center of scene
 * Scale:
 ```js
 cube.scale.set(2, 0.7, 1) //(x, y, z)
-=> //cube.scale.x
-=> //cube.scale.y
-=> //cube.scale.z
+//cube.scale.x
+//cube.scale.y
+//cube.scale.z
 ```
 
 * Rotation:
 ```js
 cube.rotation.set(Math.PI, Math.PI, Math.PI) //(x, y, z)
-=> //cube.rotation.x = Math.PI * 2 // 360deg
-=> //cube.rotation.y = Math.PI // 180deg
-=> //cube.rotation.z = Math.PI / 4 // 45deg
+//cube.rotation.x = Math.PI * 2 // 360deg
+//cube.rotation.y = Math.PI // 180deg
+//cube.rotation.z = Math.PI / 4 // 45deg
 ```
 
 * Reorder:
@@ -147,14 +147,14 @@ gsap.to(mesh.position, { duration: 1, delay: 1, x: 2, y: '+=5', ease: 'power2.in
 * ArrayCamera => multiple camera and switch between
 * StereoCamera => using for AI camera, have two camera for eyes(left and right) - TOOL ;)
 * CubeCamera => 6 camera (left, right, top, bottom, front, back)
-* OrthograpicCamera => render the scene without perspective (like games with charecter fixed size)
-*  PerspectiveCamera => render the scene with perspective
+* OrthographicCamera => render the scene without perspective (like games with character fixed size)
+* PerspectiveCamera => render the scene with perspective
 
 ```js
 perspectiveCamera(fov, aspect, near = 0.1 , far = 100)
 ```
 perspectiveCamera Parameters:
-* fov: fild of view, vertical vision angle, in degrees
+* fov: filed of view, vertical vision angle, in degrees
 * aspect: aspect ratio: the width of the render divided by the height of the render
 * near & far: how close and how far the camera can use
 
@@ -174,7 +174,7 @@ const camera = new THREE.OrthographicCamera( -1 * aspect, aspect, -1, 1, 0.1, 10
 * OrbitControls: similar to the controls we made with more features (simon website)
 * TrackballControls : like orbitControl without the vertical angle limit
 * TransformControls: changes objects position
-* DragControls: can be used to provide a drag'n'drop interaction.
+* DragControls: can be used to provide a drag and drop interaction.
 
 ```js
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
@@ -256,7 +256,7 @@ wireframe: true
 ```
 
 While wandering the three.js documentation you probably came across "BufferGeometry"
-Buffer Gerometries are more efficient and optimized but less developer friendly!
+Buffer Geometries are more efficient and optimized but less developer friendly!
 ```js
 // BoxBufferGeometry
 const geometry = new THREE.BoxBufferGeometry(1, 1, 1, 2, 2, 2)
@@ -504,7 +504,7 @@ pointLight.position.x = 4
 scene.add(pointLight)
 ```
 
-Mesh Standard Material:
+MeshStandardMaterial:
 ```js
 const textureLoader = new THREE.TextureLoader()
 const ambientOcclusionDoorTexture = textureLoader.load('/textures/door/ambientOcclusion.jpg')
@@ -535,7 +535,7 @@ plane.geometry.setAttribute(
 )
 ```
 
-Mesh Toon Material:
+MeshToonMaterial:
 ```js
 const textureLoader = new THREE.TextureLoader()
 const gradientTexture = textureLoader.load('/textures/gradients/3.jpg')
@@ -661,8 +661,8 @@ scene.add(spotLight.target)
 
 ### Performances
 min cost: AmbientLight & HemisphereLight
-moderest cost: DirectionalLight & PointLight
-hight cost: SpotLight & RectAreaLight
+mid cost: DirectionalLight & PointLight
+max cost: SpotLight & RectAreaLight
 
 ### Helpers
 ```js
@@ -719,10 +719,10 @@ scene.add(pointLightCameraHelper)
 ```
 
 ### Shadows Algorithms:
-* THREE.BasicShadowMap // best performance but lousy quality
-* THREE.PCFShadowMap (default) // less performance but smoother edges
-* THREE.PCFSoftShadowMap // less performance but even softer edges
-* THREE.VSMShadowMap // less performance, more constraints, can have unexpected results
+* THREE.BasicShadowMap: best performance but lousy quality
+* THREE.PCFShadowMap (default): less performance but smoother edges
+* THREE.PCFSoftShadowMap: less performance but even softer edges
+* THREE.VSMShadowMap: less performance, more constraints, can have unexpected results
 ```js
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.BasicShadowMap
@@ -769,7 +769,7 @@ ParticlesMaterial.alphaTest = 0.001
 // OR
 ParticlesMaterial.depthTest = false
 // OR
-ParticlesMaterial.depthWrite = false (best solution)
+ParticlesMaterial.depthWrite = false // (best solution)
 ```
 
 ### Blending:
@@ -783,7 +783,6 @@ ParticlesMaterial.blending = THREE.AdditiveBlending
 const colors = new Float32Array(count * 3) // 3 => (R, G, B)
 
 for (let i = 0; i < count * 3; i++) {
-    positions[i] = (Math.random() - 0.5) * 10
     colors[i] = Math.random()
 }
 
@@ -793,7 +792,7 @@ ParticlesGeometry.setAttribute(
 )
 
 const ParticlesMaterial = new THREE.PointsMaterial({
-    ...
+    ...others,
     vertexColors: true
 })
 ```
@@ -859,15 +858,14 @@ const tick = () =>
 -----------
 Usage example:
 * Detect if there is a wall in front of player
-* Test if the laser gun hit somthing
-* Test if somthing is currently under the mouse to simulate mouse events
+* Test if the laser gun hit something
+* Test if something is currently under the mouse to simulate mouse events
 * Show and alert message if the spaceship is heading toward a planet
 
 ```js
 const rayCaster = new THREE.Raycaster()
 
-const tick = () =>
-{
+const tick = () => {
     const elapsedTime = clock.getElapsedTime()
 
     // Update Objects
@@ -878,7 +876,7 @@ const tick = () =>
     // Cast a Ray
     const reyOrigin = new THREE.Vector3(-3, 0, 0)
     const rayDirection = new THREE.Vector3(1, 0, 0)
-    rayDirection.normalize() 
+    rayDirection.normalize()
 
     rayCaster.set(reyOrigin, rayDirection)
     // OR 
@@ -887,13 +885,14 @@ const tick = () =>
     const objects = [object1, object2, object3]
     const intersects = rayCaster.intersectObjects(objects)
 
-    for(const object of objects) {
+    for (const object of objects) {
         object.material.color.set('#ffffff')
     }
 
-    for(let item of intersects) {
+    for (let item of intersects) {
         item.object.material.color.set('#ff0000')
     }
+}
 ```
 
 
