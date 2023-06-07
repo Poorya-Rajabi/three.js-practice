@@ -855,6 +855,49 @@ const tick = () =>
 
 
 -----------
+ RAYCASTER
+-----------
+Usage example:
+* Detect if there is a wall in front of player
+* Test if the laser gun hit somthing
+* Test if somthing is currently under the mouse to simulate mouse events
+* Show and alert message if the spaceship is heading toward a planet
+
+```js
+const rayCaster = new THREE.Raycaster()
+
+const tick = () =>
+{
+    const elapsedTime = clock.getElapsedTime()
+
+    // Update Objects
+    object1.position.y = Math.sin(elapsedTime * 0.3) * 1.5
+    object2.position.y = Math.sin(elapsedTime * 0.8) * 1.5
+    object3.position.y = Math.sin(elapsedTime * 1.4) * 1.5
+
+    // Cast a Ray
+    const reyOrigin = new THREE.Vector3(-3, 0, 0)
+    const rayDirection = new THREE.Vector3(1, 0, 0)
+    rayDirection.normalize() 
+
+    rayCaster.set(reyOrigin, rayDirection)
+    // OR 
+    rayCaster.setFromCamera(mouse, camera)
+
+    const objects = [object1, object2, object3]
+    const intersects = rayCaster.intersectObjects(objects)
+
+    for(const object of objects) {
+        object.material.color.set('#ffffff')
+    }
+
+    for(let item of intersects) {
+        item.object.material.color.set('#ff0000')
+    }
+```
+
+
+-----------
  OTHERS
 -----------
 ### Group
@@ -863,6 +906,17 @@ const group = new THREE.Group()
 scene.add(group)
 
 group.add(obj1, obj2, ...)
+```
+
+### Mouse
+```js
+const mouse = new THREE.Vector2()
+
+window.addEventListener('mousemove', (event) => {
+    mouse.x = event.clientX / sizes.width * 2 - 1
+    mouse.y = - (event.clientY / sizes.height * 2 - 1)
+    console.log('x: ', mouse.x, 'y: ', mouse.y)
+})
 ```
 
 ### Fog
