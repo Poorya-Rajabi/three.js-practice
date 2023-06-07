@@ -116,6 +116,19 @@ const elapsedTime = clock.getElapsedTime() // time of reprint
 mesh.position = elapsedTime
 ```
 
+```js
+const clock = new THREE.Clock()
+let previousTime = 0
+
+const tick = () => {
+    const elapsedTime = clock.getElapsedTime()
+    const deltaTime = elapsedTime - previousTime
+    previousTime = elapsedTime
+
+    mesh.rotation.x += deltaTime
+}
+```
+
 * Sin & Cos:
 ```js
 Math.sin(elapsedTime) / Math.cos(elapsedTime)
@@ -125,7 +138,7 @@ Math.sin(elapsedTime) / Math.cos(elapsedTime)
 ```js
 import gsap from 'gsap'
 
-gsap.to(mesh.position, { duration: 1, delay: 1, x: 2 })
+gsap.to(mesh.position, { duration: 1, delay: 1, x: 2, y: '+=5', ease: 'power2.inOut' })
 ```
 
 --------
@@ -522,6 +535,18 @@ plane.geometry.setAttribute(
 )
 ```
 
+Mesh Toon Material:
+```js
+const textureLoader = new THREE.TextureLoader()
+const gradientTexture = textureLoader.load('/textures/gradients/3.jpg')
+gradientTexture.magFilter = THREE.NearestFilter
+
+const material = new THREE.MeshToonMaterial({
+    color: parameters.materialColor,
+    gradientMap: gradientTexture
+})
+```
+
 * environmentMaps
 ```js
 const cubeTextureLoader = new THREE.CubeTextureLoader()
@@ -855,4 +880,33 @@ const outsideColor = new THREE.Color('#1b3948')
 
 const mixedColor = insideColor.clone()
 mixedColor.lerp(outsideColor, alpha) // alpha: 0 to 1
+```
+
+### scroll & parallax
+```js
+const cursor = new THREE.Vector2()
+
+window.addEventListener('mousemove', (event) => {
+    cursor.x = (event.clientX / sizes.width) - 0.5
+    cursor.y = (event.clientY / sizes.height) - 0.5
+})
+
+let scrollY = window.scrollY // need update in EventListener
+const objectsDistance = 4
+const clock = new THREE.Clock()
+
+const tick = () => {
+    const elapsedTime = clock.getElapsedTime()
+    const deltaTime = elapsedTime - previousTime
+    previousTime = elapsedTime
+
+    // Scroll
+    camera.position.y = - scrollY / sizes.height * objectsDistance
+
+    // Parallax
+    const  parallaxX = cursor.x * 0.5
+    const  parallaxY = - cursor.y * 0.5
+    cameraGroup.position.x += (parallaxX - cameraGroup.position.x) * 5 * deltaTime
+    cameraGroup.position.y += (parallaxY - cameraGroup.position.y) * 5 * deltaTime
+}
 ```
