@@ -15,12 +15,16 @@ const parameters = {
 gui
     .addColor(parameters, 'materialColor')
     .onChange(() => {
-        material.color.set(parameters.materialColor)
-        particlesMaterial.color.set(parameters.materialColor)
-        for (let section of sections) {
-            section.style.color = parameters.materialColor
-        }
+        changeMaterials()
     })
+
+const changeMaterials = () => {
+    material.color.set(parameters.materialColor)
+    particlesMaterial.color.set(parameters.materialColor)
+    for (let section of sections) {
+        section.style.color = parameters.materialColor
+    }
+}
 
 /**
  * Base
@@ -78,7 +82,7 @@ const mesh1 = new THREE.Mesh(
     material
 )
 const mesh2 = new THREE.Mesh(
-    new THREE.ConeGeometry(1, 1.7, 100),
+    new THREE.IcosahedronGeometry(1.1, 0),
     material
 )
 const mesh3 = new THREE.Mesh(
@@ -155,27 +159,54 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
  */
 let scrollY = window.scrollY
 let currentSection = 0
+let newSection
+let scrollAnimation = {
+    show: false,
+    cameraPosition: 0,
+    scrollTo: 0
+}
+let scrollTarget = 0
 
-window.addEventListener('scroll', () => {
-    scrollY = window.scrollY
-
-    const newSection = Math.round(window.scrollY / sizes.height)
-
-    if(newSection !== currentSection) {
-        currentSection = newSection
-
-        gsap.to(
-            meshes[currentSection].rotation,
-            {
-                duration: 1.5,
-                ease: 'power2.inOut',
-                x: '+=5',
-                y: '+=6',
-                z: '+=1.5'
+window.addEventListener('wheel', (event) => {
+    if (event.deltaY > 0) {
+        // down
+        if(currentSection < 2) {
+            newSection = ++currentSection
+            scrollAnimation = {
+                cameraPosition: - newSection * objectsDistance,
+                scrollTo: newSection * sizes.height
             }
-        )
+            scrollY = window.scrollY
+            meshAnimation()
+        }
+    } else {
+        // up
+        if(currentSection > 0) {
+            newSection = --currentSection
+            scrollAnimation = {
+                cameraPosition: - newSection * objectsDistance,
+                scrollTo: newSection * sizes.height
+            }
+            scrollY = window.scrollY
+            meshAnimation()
+        }
     }
 })
+
+const meshAnimation = () => {
+    parameters.materialColor = ['#317ea5', '#35a760', '#99a735'][currentSection]
+    changeMaterials()
+    gsap.to(
+        meshes[currentSection].rotation,
+        {
+            duration: 1.5,
+            ease: 'power2.inOut',
+            x: '+=5',
+            y: '+=6',
+            z: '+=1.5'
+        }
+    )
+}
 
 /**
  * Cursor
@@ -200,7 +231,9 @@ const tick = () =>
     previousTime = elapsedTime
 
     // Scroll
-    camera.position.y = - scrollY / sizes.height * objectsDistance
+    camera.position.y += (scrollAnimation.cameraPosition - camera.position.y) * 5 * deltaTime
+    scrollTarget += (scrollAnimation.scrollTo - scrollTarget) * 5 * deltaTime
+    window.scrollTo(0, scrollTarget)
 
     // Parallax
     const  parallaxX = cursor.x * 0.5
@@ -213,6 +246,7 @@ const tick = () =>
         mesh.rotation.x += deltaTime * 0.1
         mesh.rotation.y += deltaTime * 0.12
     }
+    particles.rotation.y += deltaTime * 0.05
 
     // Render
     renderer.render(scene, camera)

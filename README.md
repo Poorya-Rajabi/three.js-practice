@@ -914,7 +914,6 @@ const mouse = new THREE.Vector2()
 window.addEventListener('mousemove', (event) => {
     mouse.x = event.clientX / sizes.width * 2 - 1
     mouse.y = - (event.clientY / sizes.height * 2 - 1)
-    console.log('x: ', mouse.x, 'y: ', mouse.y)
 })
 ```
 
@@ -935,7 +934,7 @@ const mixedColor = insideColor.clone()
 mixedColor.lerp(outsideColor, alpha) // alpha: 0 to 1
 ```
 
-### scroll & parallax
+### Scroll & Parallax
 ```js
 const cursor = new THREE.Vector2()
 
