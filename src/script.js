@@ -9,7 +9,7 @@ import gsap from 'gsap'
 const gui = new dat.GUI()
 
 const parameters = {
-    materialColor: '#ffeded'
+    materialColor: '#317ea5'
 }
 
 gui
@@ -17,6 +17,9 @@ gui
     .onChange(() => {
         material.color.set(parameters.materialColor)
         particlesMaterial.color.set(parameters.materialColor)
+        for (let section of sections) {
+            section.style.color = parameters.materialColor
+        }
     })
 
 /**
@@ -24,9 +27,33 @@ gui
  */
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
+const sections = document.querySelectorAll('.section')
 
 // Scene
 const scene = new THREE.Scene()
+
+/**
+ * Sizes
+ */
+const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight
+}
+
+window.addEventListener('resize', () =>
+{
+    // Update sizes
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    // Update camera
+    camera.aspect = sizes.width / sizes.height
+    camera.updateProjectionMatrix()
+
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+})
 
 /**
  * Textures
@@ -62,9 +89,9 @@ mesh1.position.y = - objectsDistance * 0
 mesh2.position.y = - objectsDistance * 1
 mesh3.position.y = - objectsDistance * 2
 
-mesh1.position.x = 2
-mesh2.position.x = -2
-mesh3.position.x = 2
+mesh1.position.x = sizes.width * 0.1 / 100
+mesh2.position.x = - sizes.width * 0.1 / 100
+mesh3.position.x = sizes.width * 0.1 / 100
 
 scene.add(mesh1, mesh2, mesh3)
 
@@ -75,7 +102,6 @@ const meshes = [ mesh1, mesh2, mesh3 ]
  */
 // Geometry
 const particlesCount = 200
-const particlesRadius = objectsDistance * meshes.length - 1
 const positions = new Float32Array(particlesCount * 3)
 for( let i = 0; i < particlesCount; i++ ) {
     const i3 = i * 3
@@ -103,29 +129,6 @@ scene.add(particles)
 const directionalLight = new THREE.DirectionalLight('#ffffff', 1)
 directionalLight.position.set(1, 1, 0)
 scene.add(directionalLight)
-
-/**
- * Sizes
- */
-const sizes = {
-    width: window.innerWidth,
-    height: window.innerHeight
-}
-
-window.addEventListener('resize', () =>
-{
-    // Update sizes
-    sizes.width = window.innerWidth
-    sizes.height = window.innerHeight
-
-    // Update camera
-    camera.aspect = sizes.width / sizes.height
-    camera.updateProjectionMatrix()
-
-    // Update renderer
-    renderer.setSize(sizes.width, sizes.height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-})
 
 /**
  * Camera
