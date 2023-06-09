@@ -8,7 +8,43 @@ import CANNON from 'cannon'
  * Debug
  */
 const gui = new dat.GUI()
+const debugObject = {
+    createSphere: () => {
+        createSphere(
+            0.25 + Math.random() * 0.25,
+            {
+                x: (Math.random() - 0.5) * 3,
+                y: 3,
+                z: (Math.random() - 0.5) * 3
+            }
+        )
+    },
+    createBox: () => {
+        createBox(
+            Math.random(),
+            Math.random(),
+            Math.random(),
+            {
+                x: (Math.random() - 0.5) * 3,
+                y: 3,
+                z: (Math.random() - 0.5) * 3
+            }
+        )
+    },
+    reset: () => {
+        for(let object of objectsToUpdate) {
+            // Remove Body
+            object.body.removeEventListener('collide', playHitSound)
+            world.removeBody(object.body)
 
+            // Remove Mesh
+            scene.remove(object.mesh)
+        }
+    }
+}
+gui.add(debugObject, 'createSphere').name('Create Sphere')
+gui.add(debugObject, 'createBox').name('Create Box')
+gui.add(debugObject, 'reset').name('Reset')
 /**
  * Base
  */
@@ -17,6 +53,21 @@ const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
+
+/**
+ * Sounds
+ */
+const hitSound = new Audio('/sounds/hit.mp3')
+
+const playHitSound = (collicion) => {
+    const impactStrength = collicion.contact.getImpactVelocityAlongNormal()
+
+    if(impactStrength > 0.7) {
+        hitSound.volume = impactStrength > 10 ? 1 : impactStrength / 10
+        hitSound.currentTime = 0
+        hitSound.play()
+    }
+}
 
 /**
  * Textures
@@ -40,31 +91,22 @@ const environmentMapTexture = cubeTextureLoader.load([
 // World
 const world = new CANNON.World()
 world.gravity.set(0, -9.82, 0)
+world.broadphase = new CANNON.SAPBroadphase(world)
+world.allowSleep = true
 
 // Materials
-const concreteMaterial = new CANNON.Material('concrete')
-const plasticMaterial = new CANNON.Material('plastic')
+const defaultMaterial = new CANNON.Material('default')
 
-const concretePlasticContactMaterial = new CANNON.ContactMaterial(
-    concreteMaterial,
-    plasticMaterial,
+const defaultContactMaterial = new CANNON.ContactMaterial(
+    defaultMaterial,
+    defaultMaterial,
     {
         friction: 0.1,
         restitution: 0.7
     }
 )
-world.addContactMaterial(concretePlasticContactMaterial)
-
-// Sphere
-const sphereShape = new CANNON.Sphere(0.5)
-const sphereBody = new CANNON.Body({
-    mass: 1,
-    position: new CANNON.Vec3(0, 3, 0),
-    shape: sphereShape,
-    material: plasticMaterial
-})
-sphereBody.applyLocalForce(new CANNON.Vec3(50, 0, 0), new CANNON.Vec3(0, 0, 0))
-world.addBody(sphereBody)
+world.addContactMaterial(defaultContactMaterial)
+world.defaultContactMaterial = defaultContactMaterial
 
 // Box
 // const boxShape = new CANNON.Box(new CANNON.Vec3(1, 1, 1))
@@ -79,31 +121,13 @@ world.addBody(sphereBody)
 const floorShape = new CANNON.Plane()
 const floorBody = new CANNON.Body({
     mess: 0,
-    shape: floorShape,
-    material: concreteMaterial
+    shape: floorShape
 })
 floorBody.quaternion.setFromAxisAngle(
     new CANNON.Vec3(-1, 0, 0),
     Math.PI * 0.5
 )
 world.addBody(floorBody)
-
-/**
- * Test sphere
- */
-const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(0.5, 32, 32),
-    new THREE.MeshStandardMaterial({
-        metalness: 0.3,
-        map: testTexture,
-        roughness: 0.4,
-        envMap: environmentMapTexture,
-        envMapIntensity: 0.5
-    })
-)
-sphere.castShadow = true
-sphere.position.y = 0.5
-scene.add(sphere)
 
 // /**
 //  * Box
@@ -200,6 +224,77 @@ renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 /**
+ * Utils
+ */
+const objectsToUpdate = []
+
+// Sphere
+const sphereGeometry = new THREE.SphereBufferGeometry(1, 20, 20)
+const sphereMaterial = new THREE.MeshStandardMaterial({
+    metalness: 0.3,
+    roughness: 0.4,
+    encMap: environmentMapTexture
+})
+const createSphere = (radius, position) => {
+    // Three.js Mesh
+    const mesh = new THREE.Mesh( sphereGeometry, sphereMaterial )
+    mesh.scale.set(radius, radius, radius)
+    mesh.castShadow = true
+    mesh.position.copy(position)
+    scene.add(mesh)
+
+    // Cannon.js Body
+    const shape = new CANNON.Sphere(radius)
+    const body = new CANNON.Body({
+        shape,
+        mass: 3,
+        position: new CANNON.Vec3(0, 3, 0)
+    })
+    body.position.copy(position)
+    body.addEventListener('collide', playHitSound)
+    world.addBody(body)
+
+    // Save in Objects Array
+    objectsToUpdate.push({
+        mesh,
+        body
+    })
+}
+
+// Sphere
+const boxGeometry = new THREE.BoxBufferGeometry(1, 1, 1)
+const boxMaterial = new THREE.MeshStandardMaterial({
+    metalness: 0.3,
+    roughness: 0.4,
+    encMap: environmentMapTexture
+})
+const createBox = (width, height, depth, position) => {
+    // Three.js Mesh
+    const mesh = new THREE.Mesh( boxGeometry, boxMaterial )
+    mesh.scale.set(width, height, depth)
+    mesh.castShadow = true
+    mesh.position.copy(position)
+    scene.add(mesh)
+
+    // Cannon.js Body
+    const shape = new CANNON.Box(new CANNON.Vec3(width / 2, height / 2, depth / 2))
+    const body = new CANNON.Body({
+        shape,
+        mass: 1,
+        position: new CANNON.Vec3(0, 3, 0)
+    })
+    body.position.copy(position)
+    body.addEventListener('collide', playHitSound)
+    world.addBody(body)
+
+    // Save in Objects Array
+    objectsToUpdate.push({
+        mesh,
+        body
+    })
+}
+
+/**
  * Animate
  */
 const clock = new THREE.Clock()
@@ -212,10 +307,11 @@ const tick = () =>
     oldElapsedTime = elapsedTime
 
     // Update Physic world
-    sphereBody.applyForce(new CANNON.Vec3(-0.5, 0, 0), sphereBody.position)
     world.step(1 / 16, deltaTime, 3)
-    sphere.position.copy(sphereBody.position)
-    // box.position.copy(boxBody.position)
+    for(let object of objectsToUpdate) {
+        object.mesh.position.copy(object.body.position)
+        object.mesh.quaternion.copy(object.body.quaternion)
+    }
 
     // Update controls
     controls.update()
