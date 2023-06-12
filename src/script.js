@@ -20,7 +20,7 @@ const scene = new THREE.Scene()
  * Galaxy
  */
 const parameters = {
-    count: 10000,
+    count: 30000,
     size: 0.01,
     radius: 5,
     branches: 3,
@@ -33,9 +33,6 @@ const parameters = {
 let geometry = null
 let material = null
 let points = null
-
-const insideColor = new THREE.Color(parameters.insideColor)
-const outsideColor = new THREE.Color(parameters.outsideColor)
 
 const galaxyGenerator = () => {
     if(geometry !== null) {
@@ -68,8 +65,8 @@ const galaxyGenerator = () => {
         positions[i3 + 2] = Math.cos(branchAngle + spinAngle) * radius + randomZ
 
         // Colors
-        const mixedColor = insideColor.clone()
-        mixedColor.lerp(outsideColor, radius / parameters.radius)
+        const mixedColor = new THREE.Color(parameters.insideColor).clone()
+        mixedColor.lerp(new THREE.Color(parameters.outsideColor), radius / parameters.radius)
 
         colors[i3    ] = mixedColor.r
         colors[i3 + 1] = mixedColor.g
@@ -144,8 +141,8 @@ window.addEventListener('resize', () =>
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
 camera.position.x = 3
-camera.position.y = 3
-camera.position.z = 3
+camera.position.y = 2
+camera.position.z = 4
 scene.add(camera)
 
 // Controls
