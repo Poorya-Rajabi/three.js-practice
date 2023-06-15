@@ -1087,6 +1087,7 @@ const reset = () => {
 -----------
 IMPORT MODELS
 -----------
+### GLTFLoader
 ```js
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
@@ -1105,6 +1106,58 @@ gltfLoader.load(
         }
     }
 )
+```
+
+### DRACOLoader
+Draco is an open-source library for compressing and decompressing 3D geometric meshes and point clouds. It is intended to improve the storage and transmission of 3D graphics.
+[Website](https://google.github.io/draco/) | [GitHub](https://github.com/google/draco)
+
+```js
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+
+const dracoLoader = new DRACOLoader();
+// copy draco directory from 'node_modules/three/examples/js/libs/draco' to your static directory
+dracoLoader.setDecoderPath('/draco/')
+
+const gltfLoader = new GLTFLoader()
+gltfLoader.setDRACOLoader(dracoLoader)
+
+gltfLoader.load(
+        '/models/Duck/glTF-Draco/Duck.gltf',
+        (gltf) =>
+        {
+          scene.add(gltf.scene)
+        }
+)
+```
+
+### Animation
+```js
+let mixer = null
+
+gltfLoader.load(
+        '/models/Fox/glTF/Fox.gltf',
+        (gltf) =>
+        {
+          gltf.scene.scale.set(0.025, 0.025, 0.025)
+          scene.add(gltf.scene)
+
+          // Animation
+          mixer = new THREE.AnimationMixer(gltf.scene)
+          const action = mixer.clipAction(gltf.animations[2])
+          action.play()
+        }
+)
+
+const tick = () => {
+    if(mixer)
+    {
+        mixer.update(deltaTime)
+    }
+    
+    //...
+}
 ```
 
 -----------
