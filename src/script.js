@@ -9,7 +9,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
  * Base
  */
 // Debug
-const gui = new dat.GUI()
+// const gui = new dat.GUI()
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -26,19 +26,21 @@ dracoLoader.setDecoderPath('/draco/')
 const gltfLoader = new GLTFLoader()
 gltfLoader.setDRACOLoader(dracoLoader)
 
-let mixer = null
+const model = {}
 
 gltfLoader.load(
     '/models/Fox/glTF/Fox.gltf',
     (gltf) =>
     {
-        gltf.scene.scale.set(0.025, 0.025, 0.025)
-        scene.add(gltf.scene)
+        model.scene = gltf.scene
+        model.scene.scale.set(0.025, 0.025, 0.025)
+        scene.add(model.scene)
 
         // Animation
-        mixer = new THREE.AnimationMixer(gltf.scene)
-        const action = mixer.clipAction(gltf.animations[2])
-        action.play()
+        model.mixer = new THREE.AnimationMixer(model.scene)
+        model.animations = gltf.animations
+        model.action = model.mixer.clipAction(model.animations[0])
+        model.action.play()
     }
 )
 
@@ -48,7 +50,7 @@ gltfLoader.load(
 const floor = new THREE.Mesh(
     new THREE.PlaneGeometry(10, 10),
     new THREE.MeshStandardMaterial({
-        color: '#444444',
+        color: '#448444',
         metalness: 0,
         roughness: 0.5
     })
@@ -102,7 +104,7 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(2, 2, 2)
+camera.position.set(-2, 2, 4)
 scene.add(camera)
 
 // Controls
@@ -124,6 +126,19 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 /**
  * Animate
  */
+const changeAnimation = (type) => {
+    model.mixer = new THREE.AnimationMixer(model.scene)
+    model.action = model.mixer.clipAction(model.animations[type])
+    model.action.play()
+}
+
+const types = ['watch', 'walk', 'run']
+for (let i = 0; i < types.length; i++) {
+    document.getElementById(types[i]).addEventListener("click", () => {
+        changeAnimation(i)
+    })
+}
+
 const clock = new THREE.Clock()
 let previousTime = 0
 
@@ -134,9 +149,9 @@ const tick = () =>
     previousTime = elapsedTime
 
     // Model animation
-    if(mixer)
+    if(model.mixer)
     {
-        mixer.update(deltaTime)
+        model.mixer.update(deltaTime)
     }
 
     // Update controls
