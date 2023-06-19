@@ -17,3 +17,25 @@ body
     left: 0;
     outline: none;
 }
+
+.actions-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.btn {
+    padding: 2px;
+    width: 70px;
+}

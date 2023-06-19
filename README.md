@@ -52,7 +52,7 @@ renderer.render(scene, camera)
 
 
 -----------
- TRANSFORM
+TRANSFORM
 -----------
 
 * Axes Helper:
@@ -101,7 +101,7 @@ camera.lookAt(cube.position) // change camera position to current object
 ```
 
 -----------
- ANIMATION
+ANIMATION
 -----------
 ```js
 window.requestAnimationFrame(callback) // pass a function before print a next frame of window
@@ -142,7 +142,7 @@ gsap.to(mesh.position, { duration: 1, delay: 1, x: 2, y: '+=5', ease: 'power2.in
 ```
 
 --------
- CAMERA
+CAMERA
 --------
 * ArrayCamera => multiple camera and switch between
 * StereoCamera => using for AI camera, have two camera for eyes(left and right) - TOOL ;)
@@ -165,7 +165,7 @@ const camera = new THREE.OrthographicCamera( -1 * aspect, aspect, -1, 1, 0.1, 10
 ```
 
 ----------
- CONTROLS
+CONTROLS
 ----------
 * DeviceOrientationControls: mobile gyroscope (deprecated!)
 * FlyControls: enables a navigation similar to fly modes in DCC tools like Blender.
@@ -185,7 +185,7 @@ controls.update() // when change the controls you need update it before render (
 ```
 
 ----------
- RESIZE
+RESIZE
 ----------
 * FullScreen & Resizing:
 ```js
@@ -250,8 +250,8 @@ BoxGeometry Parameters:
 ```js
 // Wireframe
 const material = new THREE.MeshBasicMaterial( {
-color: 0x00ff00,
-wireframe: true
+    color: 0x00ff00,
+    wireframe: true
 } )
 ```
 
@@ -384,17 +384,17 @@ Github repository: [dataarts/dat.gui](https://github.com/dataarts/dat.gui)
 TEXTURES
 ----------
 * textures resources: <br />
-[https://ambientcg.com/](https://ambientcg.com/) <br />
-[https://3dtextures.me](https://3dtextures.me) <br />
-[https://www.poliigon.com](https://www.poliigon.com/) <br />
-[https://www.arroway-textures.ch/](https://www.arroway-textures.ch/) <br />
+  [https://ambientcg.com/](https://ambientcg.com/) <br />
+  [https://3dtextures.me](https://3dtextures.me) <br />
+  [https://www.poliigon.com](https://www.poliigon.com/) <br />
+  [https://www.arroway-textures.ch/](https://www.arroway-textures.ch/) <br />
 
 * you can create your own texture: <br />
-[http://substance3d.com/](http://substance3d.com/) <br />
+  [http://substance3d.com/](http://substance3d.com/) <br />
 
 * read the following documents to understand the textures: <br />
-[https://marmoset.co/posts/basic-theory-of-physically-based-rendering/](https://marmoset.co/posts/basic-theory-of-physically-based-rendering/) <br />
-[https://marmoset.co/posts/physically-based-rendering-and-you-can-too/](https://marmoset.co/posts/physically-based-rendering-and-you-can-too/) <br />
+  [https://marmoset.co/posts/basic-theory-of-physically-based-rendering/](https://marmoset.co/posts/basic-theory-of-physically-based-rendering/) <br />
+  [https://marmoset.co/posts/physically-based-rendering-and-you-can-too/](https://marmoset.co/posts/physically-based-rendering-and-you-can-too/) <br />
 
 
 
@@ -462,7 +462,7 @@ Format and Optimisation:
 Size , Weight, Data
 
 -----------
- MATERIALS
+MATERIALS
 -----------
 
 * MeshBasicMaterial
@@ -572,10 +572,10 @@ material.envMap = environmentMapsTexture
 
 ### Where to find environment Maps: </br>
 HDRIs: [https://polyhaven.com/hdris/](https://polyhaven.com/hdris/) </br>
-HTRI to CubeMap: [https://matheowis.github.io/HDRI-to-CubeMap/](https://matheowis.github.io/HDRI-to-CubeMap/) 
+HTRI to CubeMap: [https://matheowis.github.io/HDRI-to-CubeMap/](https://matheowis.github.io/HDRI-to-CubeMap/)
 
 -----------
- 3D TEXTS
+3D TEXTS
 -----------
 we can convert a font with tools like: [facetype.js](https://gero3.github.io/facetype.js/)
 
@@ -626,7 +626,7 @@ textGeometry.center()
 ```
 
 -----------
- LIGHTS
+LIGHTS
 -----------
 
 ### Lights
@@ -686,7 +686,7 @@ scene.add(rectAreaLightHelper)
 ```
 
 -----------
- SHADOWS
+SHADOWS
 -----------
 
 just working on:
@@ -729,7 +729,7 @@ renderer.shadowMap.type = THREE.BasicShadowMap
 ```
 
 -----------
- PARTICLES
+PARTICLES
 -----------
 
 ### Built-in Geometries:
@@ -854,7 +854,7 @@ const tick = () =>
 
 
 -----------
- RAYCASTER
+RAYCASTER
 -----------
 Usage example:
 * Detect if there is a wall in front of player
@@ -1085,7 +1085,83 @@ const reset = () => {
 ```
 
 -----------
- OTHERS
+IMPORT MODELS
+-----------
+### GLTFLoader
+```js
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+
+const gltfLoader = new GLTFLoader()
+
+gltfLoader.load(
+    '/models/FlightHelmet/glTF/FlightHelmet.gltf',
+    (gltf) => {
+        scene.add(gltf.scene)
+
+        // OR -> better solution (smaller object)
+        const children = [...gltf.scene.children]
+
+        for(const child of children) {
+            scene.add(child)
+        }
+    }
+)
+```
+
+### DRACOLoader
+Draco is an open-source library for compressing and decompressing 3D geometric meshes and point clouds. It is intended to improve the storage and transmission of 3D graphics.
+[Website](https://google.github.io/draco/) | [GitHub](https://github.com/google/draco)
+
+```js
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+
+const dracoLoader = new DRACOLoader();
+// copy draco directory from 'node_modules/three/examples/js/libs/draco' to your static directory
+dracoLoader.setDecoderPath('/draco/')
+
+const gltfLoader = new GLTFLoader()
+gltfLoader.setDRACOLoader(dracoLoader)
+
+gltfLoader.load(
+        '/models/Duck/glTF-Draco/Duck.gltf',
+        (gltf) =>
+        {
+          scene.add(gltf.scene)
+        }
+)
+```
+
+### Animation
+```js
+let mixer = null
+
+gltfLoader.load(
+        '/models/Fox/glTF/Fox.gltf',
+        (gltf) =>
+        {
+          gltf.scene.scale.set(0.025, 0.025, 0.025)
+          scene.add(gltf.scene)
+
+          // Animation
+          mixer = new THREE.AnimationMixer(gltf.scene)
+          const action = mixer.clipAction(gltf.animations[2])
+          action.play()
+        }
+)
+
+const tick = () => {
+    if(mixer)
+    {
+        mixer.update(deltaTime)
+    }
+    
+    //...
+}
+```
+
+-----------
+OTHERS
 -----------
 ### Group
 ```js
