@@ -1,5 +1,33 @@
 # three.js-practice
 
+<details>
+  <summary>
+    Table of Contents
+  </summary>
+
+- [Setup](#setup)
+- [Demo](#demo)
+- [BASICS](#basics)
+- [TRANSFORM](#transform)
+- [ANIMATION](#animation)
+- [CAMERA](#camera)
+- [CONTROLS](#controls)
+- [RESIZE](#resize)
+- [GEOMETRIES](#geometries)
+- [DEBUG UI](#debug-ui)
+- [TEXTURES](#textures)
+- [MATERIALS](#materials)
+- [3D TEXTS](#3d-texts)
+- [LIGHTS](#lights)
+- [SHADOWS](#shadows)
+- [PARTICLES](#particles)
+- [RAYCASTER](#raycaster)
+- [PHYSICS](#physics)
+- [IMPORT MODELS](#import-models)
+- [OTHERS](#others)
+
+</details>
+
 ## Setup
 ``` bash
 # Install dependencies (only the first time)
@@ -16,7 +44,6 @@ npm run build
 You can try out by clicking on this demo links:
 [Haunted House](https://poorya-hh.netlify.app/)
 [Galaxy](https://galaxy-lovcqwrdn-poorya-rajabi.vercel.app/)
-
 -----------
 three.js important topics - (just an example from each topic):
 
@@ -360,7 +387,7 @@ gui.addColor(parameters, 'color')
 gui.add(parameters, 'spin').name('CLICK TO SPIN')
 ```
 
-## GUI Hints
+### GUI Hints:
 Press 'H' to hide the panel.
 
 if you want the panel to be hidden at start:
