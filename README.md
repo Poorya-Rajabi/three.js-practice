@@ -895,6 +895,194 @@ const tick = () => {
 }
 ```
 
+-----------
+PHYSICS
+-----------
+3D libraries: </br>
+[Ammo.js](https://github.com/kripken/ammo.js/) </br>
+[Cannon.js](https://github.com/schteppe/cannon.js/) </br>
+[Oimo.js](https://github.com/lo-th/Oimo.js/) </br>
+
+2D libraries: </br>
+[matter.js](https://github.com/liabru/matter-js) </br>
+[P2.js](https://github.com/schteppe/p2.js) </br>
+[Planck.js](https://github.com/shakiba/planck.js/) </br>
+[Box2D.js](https://github.com/kripken/box2d.js) </br>
+
+### CANNON.JS
+[Github](https://github.com/schteppe/cannon.js/) & [Documents](http://schteppe.github.io/cannon.js/docs/) & [Examples](https://schteppe.github.io/cannon.js/)
+#### Setup
+```bash
+npm i --save cannon
+```
+We need to create an environment just like the scene of Three.js as known as the 'world'
+```js
+import CANNON from 'cannon'
+
+// World
+const world = new CANNON.World()
+world.gravity.set(0, -9.82, 0)
+```
+
+#### Objects
+```js
+// Sphere
+const sphereShape = new CANNON.Sphere(0.5)
+const sphereBody = new CANNON.Body({
+    mass: 1,
+    position: new CANNON.Vec3(0, 3, 0),
+    shape: sphereShape
+})
+world.addBody(sphereBody)
+
+// Floor
+const floorShape = new CANNON.Plane()
+const floorBody = new CANNON.Body({
+    mess: 0, // static object
+    shape: floorShape
+    // the plane don't need a position
+})
+// Floor Rotation
+floorBody.quaternion.setFromAxisAngle(
+    new CANNON.Vec3(-1, 0, 0),
+    Math.PI * 0.5
+)
+world.addBody(floorBody)
+```
+
+#### Updating / Animation
+```js
+const clock = new THREE.Clock()
+let oldElapsedTime = 0
+
+const tick = () => {
+    const elapsedTime = clock.getElapsedTime()
+    const deltaTime = elapsedTime - oldElapsedTime
+    oldElapsedTime = elapsedTime
+
+    // Update Physic world
+    world.step(1 / 16, deltaTime, 3)
+    sphere.position.copy(sphereBody.position)
+}
+```
+
+#### Materials
+two different material:
+```js
+const concreteMaterial = new CANNON.Material('concrete')
+const plasticMaterial = new CANNON.Material('plastic')
+
+const concretePlasticContactMaterial = new CANNON.ContactMaterial(
+    concreteMaterial,
+    plasticMaterial,
+    {
+        friction: 0.1,
+        restitution: 0.7
+    }
+)
+world.addContactMaterial(concretePlasticContactMaterial)
+
+const sphereBody = new CANNON.Body({
+    ...,
+    material: plasticMaterial
+})
+
+const floorBody = new CANNON.Body({
+    ...,
+    material: concreteMaterial
+})
+```
+
+the same material:
+```js
+const defaultMaterial = new CANNON.Material('default')
+
+const defaultContactMaterial = new CANNON.ContactMaterial(
+    defaultMaterial,
+    defaultMaterial,
+    {
+        friction: 0.1,
+        restitution: 0.7
+    }
+)
+world.addContactMaterial(defaultContactMaterial)
+world.defaultContactMaterial = defaultContactMaterial
+
+// You Don't need to add this material to each object(objectBody)
+```
+
+#### Force
+```js
+// applyLocalForce
+sphereBody.applyLocalForce(new CANNON.Vec3(50, 0, 0), new CANNON.Vec3(0, 0, 0))
+
+const tick = () => {
+    // applyForce
+    sphereBody.applyForce(new CANNON.Vec3(-0.5, 0, 0), sphereBody.position)
+}
+```
+
+#### Box
+```js
+// Box sizes in Cannon.js is equal to half of the box sizes in three.js
+const shape = new CANNON.Box(new CANNON.Vec3(width / 2, height / 2, depth / 2))
+const body = new CANNON.Body({
+    shape,
+    mass: 1,
+    position: new CANNON.Vec3(0, 3, 0)
+})
+body.position.copy(position)
+world.addBody(body)
+
+const tick = () => {
+    // Position
+    box.mesh.position.copy(box.body.position)
+    // Rotation (we need to update the rotation for boxes)
+    box.mesh.quaternion.copy(box.body.quaternion)
+}
+```
+
+#### Performance
+* Broadphase
+```js
+// Broadphase => GridBroadphase / NaiveBroadphase / SAPBroadphase
+world.broadphase = new CANNON.SAPBroadphase(world) // (best performance)
+```
+
+* Sleep
+```js
+world.allowSleep = true
+```
+
+#### Events
+* Collide
+```js
+const hitSound = new Audio('/sounds/hit.mp3')
+
+const playHitSound = (collicion) => {
+    const impactStrength = collicion.contact.getImpactVelocityAlongNormal()
+
+    if(impactStrength > 0.7) {
+        hitSound.volume = impactStrength / 10
+        hitSound.currentTime = 0
+        hitSound.play()
+    }
+}
+
+body.addEventListener('collide', playHitSound)
+```
+
+#### Reset
+```js
+const reset = () => {
+    // Remove Body
+    body.removeEventListener('collide', playHitSound)
+    world.removeBody(body)
+
+    // Remove Mesh
+    scene.remove(mesh)
+}
+```
 
 -----------
  OTHERS
