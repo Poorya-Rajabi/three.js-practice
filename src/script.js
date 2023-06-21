@@ -44,6 +44,16 @@ gltfLoader.load(
     }
 )
 
+gltfLoader.load(
+    '/models/hamburger.glb',
+    (glb) => {
+        const hamburger = glb.scene
+        hamburger.scale.set(0.07, 0.07, 0.07)
+        hamburger.position.z = 2.5
+        scene.add(hamburger)
+    }
+)
+
 /**
  * Floor
  */
