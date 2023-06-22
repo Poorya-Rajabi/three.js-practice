@@ -1,15 +1,12 @@
 import './style.css'
 import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import * as dat from 'lil-gui'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 /**
  * Base
  */
-// Debug
-// const gui = new dat.GUI()
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -18,72 +15,19 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
 /**
- * Models
+ * Test sphere
  */
-const dracoLoader = new DRACOLoader()
-dracoLoader.setDecoderPath('/draco/')
-
-const gltfLoader = new GLTFLoader()
-gltfLoader.setDRACOLoader(dracoLoader)
-
-const model = {}
-
-gltfLoader.load(
-    '/models/Fox/glTF/Fox.gltf',
-    (gltf) =>
-    {
-        model.scene = gltf.scene
-        model.scene.scale.set(0.025, 0.025, 0.025)
-        scene.add(model.scene)
-
-        // Animation
-        model.mixer = new THREE.AnimationMixer(model.scene)
-        model.animations = gltf.animations
-        model.action = model.mixer.clipAction(model.animations[0])
-        model.action.play()
-    }
+const testSphere = new THREE.Mesh(
+    new THREE.SphereGeometry(1, 32, 32),
+    new THREE.MeshStandardMaterial()
 )
-
-gltfLoader.load(
-    '/models/hamburger.glb',
-    (glb) => {
-        const hamburger = glb.scene
-        hamburger.scale.set(0.07, 0.07, 0.07)
-        hamburger.position.z = 2.5
-        scene.add(hamburger)
-    }
-)
-
-/**
- * Floor
- */
-const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(10, 10),
-    new THREE.MeshStandardMaterial({
-        color: '#448444',
-        metalness: 0,
-        roughness: 0.5
-    })
-)
-floor.receiveShadow = true
-floor.rotation.x = - Math.PI * 0.5
-scene.add(floor)
+scene.add(testSphere)
 
 /**
  * Lights
  */
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.8)
-scene.add(ambientLight)
-
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6)
-directionalLight.castShadow = true
-directionalLight.shadow.mapSize.set(1024, 1024)
-directionalLight.shadow.camera.far = 15
-directionalLight.shadow.camera.left = - 7
-directionalLight.shadow.camera.top = 7
-directionalLight.shadow.camera.right = 7
-directionalLight.shadow.camera.bottom = - 7
-directionalLight.position.set(- 5, 5, 0)
+const directionalLight = new THREE.DirectionalLight('#ffffff', 3)
+directionalLight.position.set(0.25, 3, -2.25)
 scene.add(directionalLight)
 
 /**
@@ -114,12 +58,11 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(-2, 2, 4)
+camera.position.set(4, 1, - 4)
 scene.add(camera)
 
 // Controls
 const controls = new OrbitControls(camera, canvas)
-controls.target.set(0, 0.75, 0)
 controls.enableDamping = true
 
 /**
@@ -128,42 +71,15 @@ controls.enableDamping = true
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas
 })
-renderer.shadowMap.enabled = true
-renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+renderer.physicallyCorrectLights = true
 
 /**
  * Animate
  */
-const changeAnimation = (type) => {
-    model.mixer = new THREE.AnimationMixer(model.scene)
-    model.action = model.mixer.clipAction(model.animations[type])
-    model.action.play()
-}
-
-const types = ['watch', 'walk', 'run']
-for (let i = 0; i < types.length; i++) {
-    document.getElementById(types[i]).addEventListener("click", () => {
-        changeAnimation(i)
-    })
-}
-
-const clock = new THREE.Clock()
-let previousTime = 0
-
 const tick = () =>
 {
-    const elapsedTime = clock.getElapsedTime()
-    const deltaTime = elapsedTime - previousTime
-    previousTime = elapsedTime
-
-    // Model animation
-    if(model.mixer)
-    {
-        model.mixer.update(deltaTime)
-    }
-
     // Update controls
     controls.update()
 
@@ -175,3 +91,15 @@ const tick = () =>
 }
 
 tick()
+
+
+/**
+ * Debug
+ * @type {GUI}
+ */
+const gui = new dat.GUI()
+
+gui.add(directionalLight, 'intensity').min(0). max(10).step(0.001).name('LightIntensity')
+gui.add(directionalLight.position, 'x').min(- 5). max(5).step(0.001).name('LightX')
+gui.add(directionalLight.position, 'y').min(- 5). max(5).step(0.001).name('LightY')
+gui.add(directionalLight.position, 'z').min(- 5). max(5).step(0.001).name('LightZ')
