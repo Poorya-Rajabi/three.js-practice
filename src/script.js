@@ -1,20 +1,54 @@
 import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import * as dat from 'lil-gui'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { gsap } from 'gsap'
 
 /**
  * Loaders
  */
-const gltfLoader = new GLTFLoader()
-const cubeTextureLoader = new THREE.CubeTextureLoader()
+const loadingBarElement = document.querySelector('.loading-bar')
+const loadingManager = new THREE.LoadingManager(
+    // Loaded
+    () =>
+    {
+        // Wait a little
+        gsap.delayedCall(0.5, () => {
+            // Animate overlay
+            gsap.to(overlayMaterial.uniforms.uAlpha, { duration: 3, value: 0, delay: 1 })
+
+            // Update loadingBarElement
+            loadingBarElement.classList.add('ended')
+            loadingBarElement.style.transform = ''
+        })
+
+       // OR
+        // window.setTimeout(() =>
+        // {
+        //     // Animate overlay
+        //     gsap.to(overlayMaterial.uniforms.uAlpha, { duration: 3, value: 0, delay: 1 })
+        //
+        //     // Update loadingBarElement
+        //     loadingBarElement.classList.add('ended')
+        //     loadingBarElement.style.transform = ''
+        // }, 500)
+    },
+
+    // Progress
+    (itemUrl, itemsLoaded, itemsTotal) =>
+    {
+        // Calculate the progress and update the loadingBarElement
+        const progressRatio = itemsLoaded / itemsTotal
+        loadingBarElement.style.transform = `scaleX(${progressRatio})`
+    }
+)
+const gltfLoader = new GLTFLoader(loadingManager)
+const cubeTextureLoader = new THREE.CubeTextureLoader(loadingManager)
 
 /**
  * Base
  */
 // Debug
-const gui = new dat.GUI()
 const debugObject = {}
 
 // Canvas
@@ -22,6 +56,35 @@ const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
+
+/**
+ * Overlay
+ */
+const overlayGeometry = new THREE.PlaneGeometry(2, 2, 1, 1)
+const overlayMaterial = new THREE.ShaderMaterial({
+    // wireframe: true,
+    transparent: true,
+    uniforms:
+        {
+            uAlpha: { value: 1 }
+        },
+    vertexShader: `
+        void main()
+        {
+            gl_Position = vec4(position, 1.0);
+        }
+    `,
+    fragmentShader: `
+        uniform float uAlpha;
+
+        void main()
+        {
+            gl_FragColor = vec4(0.0, 0.0, 0.0, uAlpha);
+        }
+    `
+})
+const overlay = new THREE.Mesh(overlayGeometry, overlayMaterial)
+scene.add(overlay)
 
 /**
  * Update all materials
@@ -59,7 +122,6 @@ scene.background = environmentMap
 scene.environment = environmentMap
 
 debugObject.envMapIntensity = 2.5
-gui.add(debugObject, 'envMapIntensity').min(0).max(10).step(0.001).onChange(updateAllMaterials)
 
 /**
  * Models
@@ -73,23 +135,9 @@ gltfLoader.load(
         gltf.scene.rotation.y = Math.PI * 0.5
         scene.add(gltf.scene)
 
-        gui.add(gltf.scene.rotation, 'y').min(- Math.PI).max(Math.PI).step(0.001).name('rotation')
-
         updateAllMaterials()
     }
 )
-
-// gltfLoader.load(
-//     '/models/hamburger.glb',
-//     (gltf) =>
-//     {
-//         gltf.scene.scale.set(0.3, 0.3, 0.3)
-//         gltf.scene.position.set(0, - 1, 0)
-//         scene.add(gltf.scene)
-
-//         updateAllMaterials()
-//     }
-// )
 
 /**
  * Lights
@@ -101,11 +149,6 @@ directionalLight.shadow.mapSize.set(1024, 1024)
 directionalLight.shadow.normalBias = 0.05
 directionalLight.position.set(0.25, 3, - 2.25)
 scene.add(directionalLight)
-
-gui.add(directionalLight, 'intensity').min(0).max(10).step(0.001).name('lightIntensity')
-gui.add(directionalLight.position, 'x').min(- 5).max(5).step(0.001).name('lightX')
-gui.add(directionalLight.position, 'y').min(- 5).max(5).step(0.001).name('lightY')
-gui.add(directionalLight.position, 'z').min(- 5).max(5).step(0.001).name('lightZ')
 
 /**
  * Sizes
@@ -157,21 +200,6 @@ renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-
-gui
-    .add(renderer, 'toneMapping', {
-        No: THREE.NoToneMapping,
-        Linear: THREE.LinearToneMapping,
-        Reinhard: THREE.ReinhardToneMapping,
-        Cineon: THREE.CineonToneMapping,
-        ACESFilmic: THREE.ACESFilmicToneMapping
-    })
-    .onFinishChange(() =>
-    {
-        renderer.toneMapping = Number(renderer.toneMapping)
-        updateAllMaterials()
-    })
-gui.add(renderer, 'toneMappingExposure').min(0).max(10).step(0.001)
 
 /**
  * Animate
