@@ -61,8 +61,8 @@ const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
-// const axesHelper = new THREE.AxesHelper( 5 )
-// scene.add( axesHelper )
+const axesHelper = new THREE.AxesHelper( 5 )
+scene.add( axesHelper )
 
 /**
  * Overlay
@@ -138,6 +138,7 @@ gltfLoader.load(
     (gltf) =>
     {
         gltf.scene.scale.set(0.3, 0.3, 0.3)
+        gltf.scene.rotation.y = Math.PI
         scene.add(gltf.scene)
 
         gsap.to(gltf.scene.rotation, { duration: 5, delay: 2.5, x: Math.PI * 2 })
@@ -185,7 +186,7 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(4, 1,  4)
+camera.position.set(-5, 1,  4)
 scene.add(camera)
 
 // Controls
