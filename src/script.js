@@ -138,8 +138,6 @@ gltfLoader.load(
     (gltf) =>
     {
         gltf.scene.scale.set(0.3, 0.3, 0.3)
-        console.log(gltf)
-        // gltf.scene.rotation.y = Math.PI * 0.5
         scene.add(gltf.scene)
 
         gsap.to(gltf.scene.rotation, { duration: 5, delay: 2.5, x: Math.PI * 2 })
