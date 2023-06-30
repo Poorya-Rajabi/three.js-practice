@@ -61,8 +61,8 @@ const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
-const axesHelper = new THREE.AxesHelper( 5 )
-scene.add( axesHelper )
+// const axesHelper = new THREE.AxesHelper( 5 )
+// scene.add( axesHelper )
 
 /**
  * Overlay
@@ -134,7 +134,7 @@ debugObject.envMapIntensity = 2.5
  * Models
  */
 gltfLoader.load(
-    '/models/interstellar.gltf',
+    '/models/spaceship.gltf',
     (gltf) =>
     {
         gltf.scene.scale.set(0.3, 0.3, 0.3)
