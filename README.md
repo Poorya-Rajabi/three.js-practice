@@ -87,6 +87,10 @@ TRANSFORM
 * Axes Helper:
 ```js
 new THREE.AxesHelper() // 3D helper (x: red, y: green, z: blue) like RGB
+
+// Example
+const axesHelper = new THREE.AxesHelper( 5 )
+scene.add( axesHelper )
 ```
 
 * Position:

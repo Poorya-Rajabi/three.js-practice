@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { gsap } from 'gsap'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 
 /**
  * Loaders
@@ -42,8 +43,12 @@ const loadingManager = new THREE.LoadingManager(
         loadingBarElement.style.transform = `scaleX(${progressRatio})`
     }
 )
-const gltfLoader = new GLTFLoader(loadingManager)
 const cubeTextureLoader = new THREE.CubeTextureLoader(loadingManager)
+const dracoLoader = new DRACOLoader()
+dracoLoader.setDecoderPath('/draco/')
+
+const gltfLoader = new GLTFLoader(loadingManager)
+gltfLoader.setDRACOLoader(dracoLoader)
 
 /**
  * Base
@@ -56,6 +61,8 @@ const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
+// const axesHelper = new THREE.AxesHelper( 5 )
+// scene.add( axesHelper )
 
 /**
  * Overlay
@@ -108,12 +115,12 @@ const updateAllMaterials = () =>
  * Environment map
  */
 const environmentMap = cubeTextureLoader.load([
-    '/textures/environmentMaps/0/px.jpg',
-    '/textures/environmentMaps/0/nx.jpg',
-    '/textures/environmentMaps/0/py.jpg',
-    '/textures/environmentMaps/0/ny.jpg',
-    '/textures/environmentMaps/0/pz.jpg',
-    '/textures/environmentMaps/0/nz.jpg'
+    '/textures/environmentMaps/4/px.png',
+    '/textures/environmentMaps/4/nx.png',
+    '/textures/environmentMaps/4/py.png',
+    '/textures/environmentMaps/4/ny.png',
+    '/textures/environmentMaps/4/pz.png',
+    '/textures/environmentMaps/4/nz.png'
 ])
 
 environmentMap.encoding = THREE.sRGBEncoding
@@ -127,13 +134,15 @@ debugObject.envMapIntensity = 2.5
  * Models
  */
 gltfLoader.load(
-    '/models/FlightHelmet/glTF/FlightHelmet.gltf',
+    '/models/spaceship.gltf',
     (gltf) =>
     {
-        gltf.scene.scale.set(10, 10, 10)
-        gltf.scene.position.set(0, - 4, 0)
-        gltf.scene.rotation.y = Math.PI * 0.5
+        gltf.scene.scale.set(0.3, 0.3, 0.3)
+        console.log(gltf)
+        // gltf.scene.rotation.y = Math.PI * 0.5
         scene.add(gltf.scene)
+
+        gsap.to(gltf.scene.rotation, { duration: 5, delay: 2.5, x: Math.PI * 2 })
 
         updateAllMaterials()
     }
@@ -178,7 +187,7 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(4, 1, - 4)
+camera.position.set(4, 1,  4)
 scene.add(camera)
 
 // Controls
