@@ -5,8 +5,8 @@
     Table of Contents
   </summary>
 
-- [Setup](#setup)
-- [Demo](#demo)
+- [SETUP](#setup)
+- [DEMO](#demo)
 - [BASICS](#basics)
 - [TRANSFORM](#transform)
 - [ANIMATION](#animation)
@@ -25,6 +25,7 @@
 - [PHYSICS](#physics)
 - [IMPORT MODELS](#import-models)
 - [OTHERS](#others)
+- [REALISTIC RENDER](#realistic-render)
 
 </details>
 
@@ -368,7 +369,7 @@ const parameters = {
 }
 
 // Cube Positions
-gui.add(group.position, 'x').min(-3).max(3).step(0.01).name('position)
+gui.add(group.position, 'x').min(-3).max(3).step(0.01).name('position')
 
 // Cube Visibility
 gui.add(group, 'visible').name('box')
@@ -386,6 +387,15 @@ gui.addColor(parameters, 'color')
 
 // Functions
 gui.add(parameters, 'spin').name('CLICK TO SPIN')
+
+// Select
+gui.add(renderer, 'toneMapping', {
+  No: THREE.NoToneMapping,
+  Linear: THREE.LinearToneMapping,
+  Reinhard: THREE.ReinhardToneMapping,
+  Cineon: THREE.CineonToneMapping,
+  ACESFilmic: THREE.ACESFilmicToneMapping,
+})
 ```
 
 ### GUI Hints:
@@ -1187,6 +1197,51 @@ const tick = () => {
     //...
 }
 ```
+-----------
+REALISTIC RENDER
+-----------
+
+Renderer Physically Correct Lights
+```js
+renderer.physicallyCorrectLights = true // default = false
+```
+
+Renderer Encoding
+* LinearEncoding (default)
+* sRGBEncoding
+* GammaEncoding
+```js
+// all textures
+renderer.outputEncoding = THREE.sRGBEncoding
+
+// Specific Texture
+environmentMapTexture.encoding = THREE.sRGBEncoding
+```
+
+Renderer Tone Mapping
+* NoToneMapping (default)
+* LinearToneMapping
+* ReinhardToneMapping
+* CineonToneMapping
+* ACESFilmicToneMapping
+```js
+renderer.toneMapping = THREE.ACESFilmicToneMapping
+
+renderer.toneMappingExposure = 3
+```
+
+Antialias
+```js
+const renderer = new THREE.WebGLRenderer({
+  canvas: canvas,
+  antialias: true // bad performance :((
+})
+```
+
+Shadow Acne problem (Normal Bias Light)
+```js
+directionalLight.shadow.normalBias = 0.05
+```
 
 -----------
 OTHERS
@@ -1196,7 +1251,7 @@ OTHERS
 const group = new THREE.Group()
 scene.add(group)
 
-group.add(obj1, obj2, ...)
+group.add(obj1, obj2, ...[])
 ```
 
 ### Mouse
@@ -1215,6 +1270,37 @@ const fog = new THREE.Fog(0x262837, 1, 16)
 scene.fog = fog
 
 renderer.setClearColor(0x262837) // fog color
+```
+
+### Scene Environment Map
+```js
+const environmentMap = cubeTextureLoader.load([
+          '/textures/environmentMaps/0/px.jpg',
+          '/textures/environmentMaps/0/nx.jpg',
+          '/textures/environmentMaps/0/py.jpg',
+          '/textures/environmentMaps/0/ny.jpg',
+          '/textures/environmentMaps/0/pz.jpg',
+          '/textures/environmentMaps/0/nz.jpg'
+        ])
+
+scene.background = environmentMap
+scene.environment = environmentMap
+```
+
+### Update All Materials
+```js
+const updateAllMaterials = () =>
+{
+    scene.traverse((child) =>
+    {
+        if(child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial)
+        {
+            child.material.envMap = environmentMap
+            child.material.envMapIntensity = debugObject.envMapIntensity
+            child.material.needsUpdate = true
+        }
+    })
+}
 ```
 
 ### Gradient Color
