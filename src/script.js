@@ -129,12 +129,12 @@ const changeTitle = () => {
  * Environment map
  */
 const environmentMap = cubeTextureLoader.load([
-    '/textures/environmentMaps/4/px.png',
-    '/textures/environmentMaps/4/nx.png',
-    '/textures/environmentMaps/4/py.png',
-    '/textures/environmentMaps/4/ny.png',
-    '/textures/environmentMaps/4/pz.png',
-    '/textures/environmentMaps/4/nz.png'
+    '/textures/environmentMaps/4-1024/px.png',
+    '/textures/environmentMaps/4-1024/nx.png',
+    '/textures/environmentMaps/4-1024/py.png',
+    '/textures/environmentMaps/4-1024/ny.png',
+    '/textures/environmentMaps/4-1024/pz.png',
+    '/textures/environmentMaps/4-1024/nz.png'
 ])
 
 environmentMap.encoding = THREE.sRGBEncoding
