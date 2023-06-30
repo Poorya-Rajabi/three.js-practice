@@ -134,13 +134,25 @@ debugObject.envMapIntensity = 2.5
  * Models
  */
 gltfLoader.load(
-    '/models/interstellar.gltf',
+    '/models/spaceship.gltf',
     (gltf) =>
     {
         gltf.scene.scale.set(0.3, 0.3, 0.3)
+        gltf.scene.rotation.y = Math.PI
         scene.add(gltf.scene)
+        console.log(gltf.scene)
+        const planets = new THREE.Group()
+        const planet1 = gltf.scene.children.find(item => item.name === 'Plane005')
+        const planet2 = gltf.scene.children.find(item => item.name === 'Plane002')
+        planets.add(planet1, planet2)
+        planets.scale.set(0.3, 0.3, 0.3)
+        scene.add(planets)
+        planets.position.x = 150
 
-        gsap.to(gltf.scene.rotation, { duration: 5, delay: 2.5, x: Math.PI * 2 })
+        gsap.to(planets.position, { duration: 5, delay: 2.5, x: 0 })
+        gsap.to(gltf.scene.rotation, { duration: 15, delay: 7.5, x: Math.PI * 8 })
+        gsap.to(planets.rotation, { duration: 15, delay: 7.5, x: Math.PI * 8 })
+        gsap.to(planets.position, { duration: 5, delay: 10, x: -15 })
 
         updateAllMaterials()
     }
@@ -185,7 +197,7 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(4, 1,  4)
+camera.position.set(-5, 1,  4)
 scene.add(camera)
 
 // Controls
