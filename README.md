@@ -235,7 +235,7 @@ window.addEventListener('resize', () => {
 
 * Pixel Ratio:
 ```js
-renderrer.setPixelRation(Math.min(window.devicePixelRation, 2))
+renderer.setPixelRation(Math.min(window.devicePixelRation, 2))
 ```
 
 ----------
@@ -1242,6 +1242,92 @@ Shadow Acne problem (Normal Bias Light)
 ```js
 directionalLight.shadow.normalBias = 0.05
 ```
+
+-----------
+INTRO AND LOADING PROGRESS
+-----------
+HTML
+```html
+<div class="loading-bar" />
+```
+CSS
+```css
+.loading-bar
+{
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    height: 2px;
+    background: #ffffff;
+    transform: scaleX(0);
+    transform-origin: top left;
+    transition: transform 0.5s;
+    will-change: transform;
+}
+
+.loading-bar.ended
+{
+    transform: scaleX(0);
+    transform-origin: top right;
+    transition: transform 1.5s ease-in-out;
+}
+```
+Overlay
+```js
+const overlayGeometry = new THREE.PlaneGeometry(2, 2, 1, 1)
+const overlayMaterial = new THREE.ShaderMaterial({
+    // wireframe: true,
+    transparent: true,
+    uniforms:
+        {
+            uAlpha: { value: 1 }
+        },
+    vertexShader: `
+        void main()
+        {
+            gl_Position = vec4(position, 1.0);
+        }
+    `,
+    fragmentShader: `
+        uniform float uAlpha;
+
+        void main()
+        {
+            gl_FragColor = vec4(0.0, 0.0, 0.0, uAlpha);
+        }
+    `
+})
+const overlay = new THREE.Mesh(overlayGeometry, overlayMaterial)
+scene.add(overlay)
+```
+Progress
+```js
+const loadingBarElement = document.querySelector('.loading-bar')
+const loadingManager = new THREE.LoadingManager(
+    // Loaded
+    () => {
+        // Wait a little (gsap.delayedCall or window.setTimeout)
+        gsap.delayedCall(0.5, () => {
+            // Animate overlay
+            gsap.to(overlayMaterial.uniforms.uAlpha, { duration: 3, value: 0, delay: 1 })
+
+            // Update loadingBarElement
+            loadingBarElement.classList.add('ended')
+            loadingBarElement.style.transform = ''
+        })
+    },
+
+    // Progress
+    (itemUrl, itemsLoaded, itemsTotal) => {
+        // Calculate the progress and update the loadingBarElement
+        const progressRatio = itemsLoaded / itemsTotal
+        loadingBarElement.style.transform = `scaleX(${progressRatio})`
+    }
+)
+const gltfLoader = new GLTFLoader(loadingManager)
+const cubeTextureLoader = new THREE.CubeTextureLoader(loadingManager)
+```
+
 
 -----------
 OTHERS
