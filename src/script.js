@@ -22,17 +22,6 @@ const loadingManager = new THREE.LoadingManager(
             loadingBarElement.classList.add('ended')
             loadingBarElement.style.transform = ''
         })
-
-       // OR
-        // window.setTimeout(() =>
-        // {
-        //     // Animate overlay
-        //     gsap.to(overlayMaterial.uniforms.uAlpha, { duration: 3, value: 0, delay: 1 })
-        //
-        //     // Update loadingBarElement
-        //     loadingBarElement.classList.add('ended')
-        //     loadingBarElement.style.transform = ''
-        // }, 500)
     },
 
     // Progress
@@ -111,6 +100,31 @@ const updateAllMaterials = () =>
     })
 }
 
+const changeTitle = () => {
+    let title = '🚀____________________'
+    function getShiftedString(s, leftShifts, rightShifts) {
+        s = leftShifting(s, leftShifts)
+        return rightShifting(s,  rightShifts)
+    }
+
+    function leftShifting(s, leftShifts) {
+        return s.substring(leftShifts) + s.substring(0, leftShifts)
+    }
+
+    function rightShifting(s,  rightShifts) {
+        let l = s.length - rightShifts
+        return leftShifting(s, l)
+    }
+
+
+    for (let i = 1; i < 21; i++) {
+        gsap.delayedCall(0.5 * i, () => {
+            title = rightShifting(title, 1)
+            document.title = title
+        })
+    }
+}
+
 /**
  * Environment map
  */
@@ -140,19 +154,27 @@ gltfLoader.load(
         gltf.scene.scale.set(0.3, 0.3, 0.3)
         gltf.scene.rotation.y = Math.PI
         scene.add(gltf.scene)
-        console.log(gltf.scene)
+
         const planets = new THREE.Group()
         const planet1 = gltf.scene.children.find(item => item.name === 'Plane005')
         const planet2 = gltf.scene.children.find(item => item.name === 'Plane002')
+
         planets.add(planet1, planet2)
         planets.scale.set(0.3, 0.3, 0.3)
         scene.add(planets)
         planets.position.x = 150
 
-        gsap.to(planets.position, { duration: 5, delay: 2.5, x: 0 })
+        gsap.to(planets.position, { duration: 5, delay: 2.5, x: 0 }).then(() => {
+            gsap.delayedCall(2, () => {
+                changeTitle()
+            })
+        })
         gsap.to(gltf.scene.rotation, { duration: 15, delay: 7.5, x: Math.PI * 8 })
         gsap.to(planets.rotation, { duration: 15, delay: 7.5, x: Math.PI * 8 })
-        gsap.to(planets.position, { duration: 5, delay: 10, x: -15 })
+        gsap.to(planets.position, { duration: 5, delay: 10, x: -15 }).then(() => {
+            gsap.to(camera.position, { duration: 2, z: 0 })
+            gsap.to(gltf.scene.position, { duration: 2, z: 4, x: 3 })
+        })
 
         updateAllMaterials()
     }
