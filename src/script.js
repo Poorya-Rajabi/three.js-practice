@@ -134,7 +134,7 @@ debugObject.envMapIntensity = 2.5
  * Models
  */
 gltfLoader.load(
-    '/models/spaceship.gltf',
+    '/models/interstellar.gltf',
     (gltf) =>
     {
         gltf.scene.scale.set(0.3, 0.3, 0.3)
