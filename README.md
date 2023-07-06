@@ -26,6 +26,7 @@
 - [IMPORT MODELS](#import-models)
 - [OTHERS](#others)
 - [REALISTIC RENDER](#realistic-render)
+- [POST PROCESSING](#post-processing)
 
 </details>
 
@@ -1332,6 +1333,79 @@ const gltfLoader = new GLTFLoader(loadingManager)
 const cubeTextureLoader = new THREE.CubeTextureLoader(loadingManager)
 ```
 
+-----------
+POST PROCESSING
+-----------
+[EffectComposer](https://threejs.org/docs/#examples/en/postprocessing/EffectComposer)
+```js
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer"
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
+
+const effectProcessor = new EffectComposer(renderer)
+effectProcessor.setSize(sizes.width, sizes.height)
+effectProcessor.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+const renderPass = new RenderPass(scene, camera)
+effectProcessor.addPass(renderPass)
+
+const tick = () => {
+    //...
+    // renderer.render(scene, camera)
+    effectProcessor.render()
+}
+```
+DotScreenPass
+```js
+import { DotScreenPass } from "three/examples/jsm/postprocessing/DotScreenPass"
+
+const dotScreenPass = new DotScreenPass()
+effectProcessor.addPass(dotScreenPass)
+
+// enable or disable effect
+dotScreenPass.enabled = false
+```
+GlitchPass
+```js
+import { GlitchPass } from "three/examples/jsm/postprocessing/GlitchPass"
+
+const glitchPass = new GlitchPass()
+glitchPass.goWild = true // show effect without break
+effectProcessor.addPass(glitchPass)
+```
+ShaderPass
+```js
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass"
+import { RGBShiftShader } from "three/examples/jsm/shaders/RGBShiftShader"
+
+const rgbShiftPass = new ShaderPass(RGBShiftShader)
+effectProcessor.addPass(rgbShiftPass)
+```
+
+Fixing the color by Render Target
+```js
+const renderTarget = new THREE.WebGLRenderTarget(
+        sizes.width,
+        sizes.height,
+        {
+          minFilter: THREE.LinearFilter,
+          magFilter: THREE.LinearFilter,
+          format: THREE.RGBAFormat,
+          encoding: THREE.sRGBEncoding
+        }
+)
+
+const effectProcessor = new EffectComposer(renderer, renderTarget)
+```
+
+Resizing
+```js
+window.addEventListener('resize', () =>
+{
+    //...
+    effectProcessor.setSize(sizes.width, sizes.height)
+    effectProcessor.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+})
+```
 
 -----------
 OTHERS
