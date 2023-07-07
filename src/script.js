@@ -9,6 +9,8 @@ import { DotScreenPass } from "three/examples/jsm/postprocessing/DotScreenPass"
 import { GlitchPass } from "three/examples/jsm/postprocessing/GlitchPass"
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass"
 import { RGBShiftShader } from "three/examples/jsm/shaders/RGBShiftShader"
+import { SMAAPass } from "three/examples/jsm/postprocessing/SMAAPass"
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
 import {LinearFilter, RGBAFormat} from "three";
 
 /**
@@ -148,7 +150,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
  * Post Processing
  */
 // Render Target
-const renderTarget = new THREE.WebGLRenderTarget(
+const renderTarget = new THREE.WebGLMultisampleRenderTarget(
     sizes.width,
     sizes.height,
     {
@@ -174,11 +176,23 @@ effectProcessor.addPass(dotScreenPass)
 
 const glitchPass = new GlitchPass()
 glitchPass.goWild = false
-glitchPass.enabled = false
+glitchPass.enabled = true
 effectProcessor.addPass(glitchPass)
 
 const rgbShiftPass = new ShaderPass(RGBShiftShader)
+rgbShiftPass.enabled = false
 effectProcessor.addPass(rgbShiftPass)
+
+const unrealBloomPass = new UnrealBloomPass()
+unrealBloomPass.enabled = true
+unrealBloomPass.strength = 0.5
+unrealBloomPass.radius = 1
+unrealBloomPass.threshold = 0.9
+effectProcessor.addPass(unrealBloomPass)
+
+const smaaPass = new SMAAPass()
+smaaPass.enabled = false
+effectProcessor.addPass(smaaPass)
 
 /**
  * Animate

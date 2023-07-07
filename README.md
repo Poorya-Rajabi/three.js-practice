@@ -1380,6 +1380,16 @@ import { RGBShiftShader } from "three/examples/jsm/shaders/RGBShiftShader"
 const rgbShiftPass = new ShaderPass(RGBShiftShader)
 effectProcessor.addPass(rgbShiftPass)
 ```
+UnrealBloomPass
+```js
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
+
+const unrealBloomPass = new UnrealBloomPass
+unrealBloomPass.strength = 0.5
+unrealBloomPass.radius = 1
+unrealBloomPass.threshold = 0.9
+effectProcessor.addPass(unrealBloomPass)
+```
 
 Fixing the color by Render Target
 ```js
@@ -1395,6 +1405,20 @@ const renderTarget = new THREE.WebGLRenderTarget(
 )
 
 const effectProcessor = new EffectComposer(renderer, renderTarget)
+```
+Fixing the Antialias
+```js
+// using the WebGLMultisampleRenderTarget instead of WebGLRenderTarget
+const renderTarget = new THREE.WebGLMultisampleRenderTarget(
+    // ...
+)
+```
+```js
+// SMAAPass
+import { SMAAPass } from "three/examples/jsm/postprocessing/SMAAPass"
+
+const smaaPass = new SMAAPass()
+effectProcessor.addPass(smaaPass)
 ```
 
 Resizing
