@@ -147,34 +147,63 @@ debugObject.envMapIntensity = 2.5
 /**
  * Models
  */
+// const axesHelper = new THREE.AxesHelper( 5 )
+// scene.add( axesHelper )
+
 gltfLoader.load(
-    '/models/spaceship.gltf',
+    '/models/TARS.gltf',
     (gltf) =>
     {
-        gltf.scene.scale.set(0.3, 0.3, 0.3)
-        gltf.scene.rotation.y = Math.PI
-        scene.add(gltf.scene)
+        const model = gltf.scene
+        // scene.add(model)
+        // console.log(gltf)
 
-        const planets = new THREE.Group()
-        const planet1 = gltf.scene.children.find(item => item.name === 'Plane005')
-        const planet2 = gltf.scene.children.find(item => item.name === 'Plane002')
-
-        planets.add(planet1, planet2)
-        planets.scale.set(0.3, 0.3, 0.3)
-        scene.add(planets)
-        planets.position.x = 150
-
-        gsap.to(planets.position, { duration: 5, delay: 2.5, x: 0 }).then(() => {
-            gsap.delayedCall(2, () => {
-                changeTitle()
-            })
+        const x1 = model.children.find(mesh => {
+            return mesh.name === 'Tars001'
         })
-        gsap.to(gltf.scene.rotation, { duration: 15, delay: 7.5, x: Math.PI * 8 })
-        gsap.to(planets.rotation, { duration: 15, delay: 7.5, x: Math.PI * 8 })
-        gsap.to(planets.position, { duration: 5, delay: 10, x: -15 }).then(() => {
-            gsap.to(camera.position, { duration: 2, z: 0 })
-            gsap.to(gltf.scene.position, { duration: 2, z: 4, x: 3 })
+        const x2 = model.children.find(mesh => {
+            return mesh.name === 'Tars002'
         })
+        const x3 = model.children.find(mesh => {
+            return mesh.name === 'Tars003'
+        })
+        const x4 = model.children.find(mesh => {
+            return mesh.name === 'Tars004'
+        })
+
+        const group1 = new THREE.Group()
+        group1.add(x1, x4)
+        group1.rotation.z = - Math.PI * 0.1
+        group1.position.set(-0.5,-0.5,0)
+        const group2 = new THREE.Group()
+        group2.add(x2, x3)
+        console.log(group2)
+
+        scene.add(group1, group2)
+        // gltf.scene.scale.set(0.3, 0.3, 0.3)
+        // gltf.scene.rotation.y = Math.PI
+        // scene.add(gltf.scene)
+        //
+        // const planets = new THREE.Group()
+        // const planet1 = gltf.scene.children.find(item => item.name === 'Plane005')
+        // const planet2 = gltf.scene.children.find(item => item.name === 'Plane002')
+        //
+        // planets.add(planet1, planet2)
+        // planets.scale.set(0.3, 0.3, 0.3)
+        // scene.add(planets)
+        // planets.position.x = 150
+        //
+        // gsap.to(planets.position, { duration: 5, delay: 2.5, x: 0 }).then(() => {
+        //     gsap.delayedCall(2, () => {
+        //         changeTitle()
+        //     })
+        // })
+        // gsap.to(gltf.scene.rotation, { duration: 15, delay: 7.5, x: Math.PI * 8 })
+        // gsap.to(planets.rotation, { duration: 15, delay: 7.5, x: Math.PI * 8 })
+        // gsap.to(planets.position, { duration: 5, delay: 10, x: -15 }).then(() => {
+        //     gsap.to(camera.position, { duration: 2, z: 0 })
+        //     gsap.to(gltf.scene.position, { duration: 2, z: 4, x: 3 })
+        // })
 
         updateAllMaterials()
     }
