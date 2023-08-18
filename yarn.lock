@@ -3611,7 +3611,7 @@ terser@^5.7.2:
 
 three@^0.134.0:
   version "0.134.0"
-  resolved "https://registry.npmjs.org/three/-/three-0.134.0.tgz"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.134.0.tgz#d7ad4d85d050da0861bf39749b06ddfb5f17157f"
   integrity sha512-LbBerg7GaSPjYtTOnu41AMp7tV6efUNR3p4Wk5NzkSsNTBuA5mDGOfwwZL1jhhVMLx9V20HolIUo0+U3AXehbg==
 
 thunky@^1.0.2:

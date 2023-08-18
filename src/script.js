@@ -2,25 +2,22 @@ import './style.css'
 import * as THREE from 'three'
 import * as dat from 'lil-gui'
 import gsap from 'gsap'
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 /**
  * Debug
  */
-const gui = new dat.GUI()
+// const gui = new dat.GUI()
 
-const parameters = {
-    materialColor: '#317ea5'
-}
-
-gui
-    .addColor(parameters, 'materialColor')
-    .onChange(() => {
-        material.color.set(parameters.materialColor)
-        particlesMaterial.color.set(parameters.materialColor)
-        for (let section of sections) {
-            section.style.color = parameters.materialColor
-        }
-    })
+// gui
+//     .addColor(parameters, 'materialColor')
+//     .onChange(() => {
+//         material.color.set(parameters.materialColor)
+//         particlesMaterial.color.set(parameters.materialColor)
+//         for (let section of sections) {
+//             section.style.color = parameters.materialColor
+//         }
+//     })
 
 /**
  * Base
@@ -28,9 +25,25 @@ gui
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
 const sections = document.querySelectorAll('.section')
+const counter = document.querySelector('#counter')
 
 // Scene
 const scene = new THREE.Scene()
+
+// Loaders
+const gltfLoader = new GLTFLoader()
+
+// Update Materials
+// function updateAllMaterials() {
+//     scene.traverse((child) => {
+//         // if(child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
+//         //     child.material = new THREE.MeshBasicMaterial( { color: 0xffffff } )
+//         // }
+//         if (!child.isMesh) return;
+//         child.material = child.material.clone();
+//         child.material.wireframe = true
+//     })
+// }
 
 /**
  * Sizes
@@ -40,8 +53,7 @@ const sizes = {
     height: window.innerHeight
 }
 
-window.addEventListener('resize', () =>
-{
+window.addEventListener('resize', () => {
     // Update sizes
     sizes.width = window.innerWidth
     sizes.height = window.innerHeight
@@ -56,58 +68,73 @@ window.addEventListener('resize', () =>
 })
 
 /**
- * Textures
- */
-const textureLoader = new THREE.TextureLoader()
-const gradientTexture = textureLoader.load('/textures/gradients/3.jpg')
-gradientTexture.magFilter = THREE.NearestFilter
-
-/**
  * Objects
  */
 // Material
-const material = new THREE.MeshToonMaterial({
-    color: parameters.materialColor,
-    gradientMap: gradientTexture
-})
 
 // Meshes
 const objectsDistance = 4
-const mesh1 = new THREE.Mesh(
-    new THREE.TorusGeometry(0.7, 0.4, 16, 60),
-    material
-)
-const mesh2 = new THREE.Mesh(
-    new THREE.ConeGeometry(1, 1.7, 100),
-    material
-)
-const mesh3 = new THREE.Mesh(
-    new THREE.TorusKnotGeometry(0.6, 0.25, 100, 16),
-    material
-)
-mesh1.position.y = - objectsDistance * 0
-mesh2.position.y = - objectsDistance * 1
-mesh3.position.y = - objectsDistance * 2
+const animals = ['fish', 'dolphin', 'mantaray', 'shark', 'whale']
+const customData = {
+    fish: {
+        index: 1,
+        scale: 0.15
+    },
+    dolphin: {
+        index: 2,
+        scale: 0.2
+    },
+    mantaray: {
+        index: 3,
+        scale: 0.2
+    },
+    shark: {
+        index: 4,
+        scale: 0.3
+    },
+    whale: {
+        index: 5,
+        scale: 0.6
+    },
+}
+const models = {}
 
-mesh1.position.x = sizes.width * 0.1 / 100
-mesh2.position.x = - sizes.width * 0.1 / 100
-mesh3.position.x = sizes.width * 0.1 / 100
+for(let animal of animals) {
+    gltfLoader.load(
+        `/models/${animal}/${animal}.gltf`,
+        (gltf) => {
+            const index = animals.indexOf(animal)
+            models[animal] = gltf
+            models[animal].scene = gltf.scene
+            // models[animal].scene.children[0].children[1].children[0].material.wireframe = true
+            // // models[animal].scene.children[0].children[1].children[0].material.color = new THREE.Color(1, 1, 1)
+            models[animal].scene.children[0].children[1].children[1].material.wireframe = true
+            models[animal].scene.scale.set(customData[animal].scale, customData[animal].scale, customData[animal].scale)
+            models[animal].scene.position.y = - (index + 1) * objectsDistance
+            models[animal].scene.rotation.y = -Math.PI * 0.3
 
-scene.add(mesh1, mesh2, mesh3)
+            models[animal].mixer = new THREE.AnimationMixer( models[animal].scene )
+            models[animal].action = models[animal].mixer.clipAction( gltf.animations[ 0 ] )
+            models[animal].action.play()
 
-const meshes = [ mesh1, mesh2, mesh3 ]
+
+            // updateAllMaterials()
+            scene.add( models[animal].scene )
+        }
+    )
+}
 
 /**
  * Particles
  */
 // Geometry
-const particlesCount = 200
+const particlesCount = 400
 const positions = new Float32Array(particlesCount * 3)
 for( let i = 0; i < particlesCount; i++ ) {
     const i3 = i * 3
 
     positions[i3    ] = (Math.random() - 0.5) * 10
-    positions[i3 + 1] = objectsDistance * 0.5 - Math.random() * objectsDistance * meshes.length
+    positions[i3 + 1] = objectsDistance * 0.5 - Math.random() * objectsDistance * animals.length
     positions[i3 + 2] = (Math.random() - 0.5) * 10
 }
 const particlesGeometry = new THREE.BufferGeometry()
@@ -116,7 +143,7 @@ particlesGeometry.setAttribute(
  new THREE.BufferAttribute(positions, 3)
 )
 const particlesMaterial = new THREE.PointsMaterial({
-    color: parameters.materialColor,
+    color: '#ffffff',
     sizeAttenuation: true,
     size: 0.03
 })
@@ -158,22 +185,35 @@ let currentSection = 0
 
 window.addEventListener('scroll', () => {
     scrollY = window.scrollY
-
-    const newSection = Math.round(window.scrollY / sizes.height)
+    const ration = window.scrollY / sizes.height
+    const newSection = Math.round(ration)
 
     if(newSection !== currentSection) {
         currentSection = newSection
 
-        gsap.to(
-            meshes[currentSection].rotation,
-            {
-                duration: 1.5,
-                ease: 'power2.inOut',
-                x: '+=5',
-                y: '+=6',
-                z: '+=1.5'
-            }
-        )
+        // gsap.to(
+        //     meshes[currentSection].rotation,
+        //     {
+        //         duration: 1.5,
+        //         ease: 'power2.inOut',
+        //         x: '+=5',
+        //         y: '+=6',
+        //         z: '+=1.5'
+        //     }
+        // )
+    }
+
+
+    if (ration < 1) {
+        counter.style.opacity = 0
+    } else if (ration < 3) {
+        counter.style.opacity = 1
+        counter.innerHTML = Math.floor(ration * 30) - 29
+    } else if (ration < 4) {
+        counter.style.opacity = 1
+        counter.innerHTML = Math.floor(ration * 360 / 4)
+    } else {
+        counter.style.opacity = 0
     }
 })
 
@@ -209,9 +249,25 @@ const tick = () =>
     cameraGroup.position.y += (parallaxY - cameraGroup.position.y) * 5 * deltaTime
 
     // Animate Meshes
-    for(const mesh of meshes) {
-        mesh.rotation.x += deltaTime * 0.1
-        mesh.rotation.y += deltaTime * 0.12
+    // for(const mesh of meshes) {
+    //     mesh.rotation.x += deltaTime * 0.1
+    //     mesh.rotation.y += deltaTime * 0.12
+    // }
+
+    //animate animals
+    for(let animal of animals) {
+        if (models[animal]?.scene && models[animal]?.mixer) {
+            const y = models[animal].scene.position.y
+            models[animal].mixer.update(deltaTime)
+            models[animal].scene.rotation.y += deltaTime
+            // models[animal].scene.position.set(
+            //     -Math.sin(elapsedTime) * 2,
+            //     y + Math.sin(elapsedTime) * 0.005,
+            //     -Math.cos(elapsedTime) * 2
+            // )
+            models[animal].scene.position.x = -Math.sin(elapsedTime) * 2
+            models[animal].scene.position.z = -Math.cos(elapsedTime) * 2
+        }
     }
 
     // Render

@@ -1,16 +1,50 @@
+@font-face {
+    font-family: 'poly';
+    src: url('/static/fonts/poly.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'major';
+    src: url('/static/fonts/major.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
 * {
     margin: 0;
     padding: 0;
+    font-family: 'major', serif;
 }
 
 html {
-    background-color: #1e1a20;
+    background: linear-gradient(180deg, #0076b5, #081844);
+    scroll-behavior: smooth;
 }
 
-/*html,*/
-/*body {*/
-/*    overflow: hidden;*/
+/*h1, h6 {*/
+/*    text-transform: uppercase;*/
 /*}*/
+
+h1 {
+    font-family: 'poly', serif;
+    font-size: 10rem;
+    font-weight: normal;
+    margin-bottom: 24px;
+}
+
+h6 {
+    font-size: 2.5rem;
+}
+
+p {
+    margin-top: 24px;
+    font-size: 2rem;
+    max-width: 600px;
+}
 
 .webgl {
     position: fixed;
@@ -22,17 +56,103 @@ html {
 
 .section {
     display: flex;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
     height: 100vh;
     position: relative;
     font-family: 'Cabin', sans-serif;
-    color: #317ea5;
-    text-transform: uppercase;
+    color: white;
     font-size: 7vmin;
     padding-left: 10%;
     padding-right: 10%;
+    text-align: center;
 }
 
-section:nth-child(odd) {
-    justify-content: flex-end;
+.button {
+    background-color: transparent;
+    border: white 2px solid;
+    color: white;
+    padding: 20px 34px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: white;
+    border: #0076b5 2px solid;
+    color: #0076b5;
+}
+
+.btn.btn-border-1::after,
+.btn.btn-border-1::before {
+    position: absolute;
+    content: "";
+    width: 0%;
+    height: 0%;
+    visibility: hidden;
+}
+
+.btn.btn-border-1::after {
+    bottom: -3px;
+    right: -3px;
+    border-left: 3px solid #222222;
+    border-bottom: 3px solid #222222;
+    transition: width .1s ease .1s, height .1s ease, visibility 0s .2s;
+}
+
+.btn.btn-border-1::before {
+    top: -3px;
+    left: -3px;
+    border-top: 3px solid #222222;
+    border-right: 3px solid #222222;
+    transition: width .1s ease .3s, height .1s ease .2s, visibility 0s .4s;
+}
+
+.btn.btn-border-1:hover {
+    animation: pulse 1s ease-out .4s;
+    color: #222222;
+}
+
+.btn.btn-border-1:hover::after,
+.btn.btn-border-1:hover::before {
+    width: calc(100% + 3px);
+    height: calc(100% + 3px);
+    visibility: visible;
+    transition: width .1s ease .2s, height .1s ease .3s, visibility 0s .2s;
+}
+
+.btn.btn-border-1:hover::after {
+    transition: width .1s ease .2s, height .1s ease .3s, visibility 0s .2s;
+}
+
+.btn.btn-border-1:hover::before {
+    transition: width .1s ease, height .1s ease .1s;
+}
+
+#counter {
+    font-family: 'poly', serif;
+    /*opacity: 0;*/
+    transition: opacity 1s;
+    position: fixed;
+    font-weight: normal;
+    line-height: 0.88;
+    bottom: 0;
+    right: 0;
+    font-size: 30rem;
+    color: rgba(256, 256, 256, 0.2);
+}
+
+#counter::after {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    content: 'DAYS';
+    font-size: 5rem;
+    font-weight: bold;
+    transform: translate(16%, -191%) rotate(-90deg);
 }
