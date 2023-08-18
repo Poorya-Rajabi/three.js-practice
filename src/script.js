@@ -82,7 +82,7 @@ const customData = {
     },
     dolphin: {
         index: 2,
-        scale: 0.2
+        scale: 0.18
     },
     mantaray: {
         index: 3,
