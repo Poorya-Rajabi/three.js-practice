@@ -9,13 +9,37 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 const canvas = document.querySelector('canvas.webgl')
 const sections = document.querySelectorAll('.section')
 const counter = document.querySelector('#counter')
+const loadingBarElement = document.querySelector('.loading-bar')
+const loadingContainerElement = document.querySelector('.loading-container')
 
 // Scene
 const scene = new THREE.Scene()
 
 // Loaders
-const gltfLoader = new GLTFLoader()
-const textureLoader = new THREE.TextureLoader()
+const loadingManager = new THREE.LoadingManager(
+    // Loaded
+    () =>
+    {
+        window.setTimeout(() =>
+        {
+            // Update loadingBarElement
+            loadingBarElement.classList.add('ended')
+            loadingBarElement.style.transform = ''
+            loadingContainerElement.style.opacity = 0
+            loadingContainerElement.style.zIndex = -1
+        }, 500)
+    },
+
+    // Progress
+    (itemUrl, itemsLoaded, itemsTotal) =>
+    {
+        // Calculate the progress and update the loadingBarElement
+        const progressRatio = itemsLoaded / itemsTotal
+        loadingBarElement.style.transform = `scaleX(${progressRatio})`
+    }
+)
+const gltfLoader = new GLTFLoader(loadingManager)
+const textureLoader = new THREE.TextureLoader(loadingManager)
 
 /**
  * Sizes
@@ -83,7 +107,7 @@ for(let animal of animals) {
             models[animal].scene.children[0].children[1].children[1].material.wireframe = true
             models[animal].scene.scale.set(customData[animal].scale, customData[animal].scale, customData[animal].scale)
             models[animal].scene.position.y = - (index + 1) * objectsDistance
-            models[animal].scene.rotation.y = -Math.PI * 0.3
+            models[animal].scene.rotation.y = -Math.PI * 0.5
 
             models[animal].mixer = new THREE.AnimationMixer( models[animal].scene )
             models[animal].action = models[animal].mixer.clipAction( gltf.animations[ 0 ] )
