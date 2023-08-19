@@ -23,11 +23,8 @@
 html {
     background: linear-gradient(180deg, #0076b5, #081844);
     scroll-behavior: smooth;
+    font-family: 'Cabin', sans-serif;
 }
-
-/*h1, h6 {*/
-/*    text-transform: uppercase;*/
-/*}*/
 
 h1 {
     font-family: 'poly', serif;
@@ -43,7 +40,6 @@ h6 {
 p {
     margin-top: 24px;
     font-size: 2rem;
-    max-width: 600px;
 }
 
 .webgl {
@@ -57,16 +53,32 @@ p {
 .section {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    height: 100vh;
+    position: relative;
+    color: white;
+    padding-left: 10%;
+    padding-right: 10%;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.first-section {
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100vh;
     position: relative;
-    font-family: 'Cabin', sans-serif;
     color: white;
-    font-size: 7vmin;
     padding-left: 10%;
     padding-right: 10%;
     text-align: center;
+}
+
+.btn-group {
+    margin-top: 16px;
 }
 
 .button {
@@ -86,52 +98,6 @@ p {
     background-color: white;
     border: #0076b5 2px solid;
     color: #0076b5;
-}
-
-.btn.btn-border-1::after,
-.btn.btn-border-1::before {
-    position: absolute;
-    content: "";
-    width: 0%;
-    height: 0%;
-    visibility: hidden;
-}
-
-.btn.btn-border-1::after {
-    bottom: -3px;
-    right: -3px;
-    border-left: 3px solid #222222;
-    border-bottom: 3px solid #222222;
-    transition: width .1s ease .1s, height .1s ease, visibility 0s .2s;
-}
-
-.btn.btn-border-1::before {
-    top: -3px;
-    left: -3px;
-    border-top: 3px solid #222222;
-    border-right: 3px solid #222222;
-    transition: width .1s ease .3s, height .1s ease .2s, visibility 0s .4s;
-}
-
-.btn.btn-border-1:hover {
-    animation: pulse 1s ease-out .4s;
-    color: #222222;
-}
-
-.btn.btn-border-1:hover::after,
-.btn.btn-border-1:hover::before {
-    width: calc(100% + 3px);
-    height: calc(100% + 3px);
-    visibility: visible;
-    transition: width .1s ease .2s, height .1s ease .3s, visibility 0s .2s;
-}
-
-.btn.btn-border-1:hover::after {
-    transition: width .1s ease .2s, height .1s ease .3s, visibility 0s .2s;
-}
-
-.btn.btn-border-1:hover::before {
-    transition: width .1s ease, height .1s ease .1s;
 }
 
 #counter {
@@ -155,4 +121,36 @@ p {
     font-size: 5rem;
     font-weight: bold;
     transform: translate(16%, -191%) rotate(-90deg);
+}
+
+@media only screen and (max-width: 900px) {
+    h1 {
+        font-size: 3rem;
+        margin-bottom: 16px;
+    }
+
+    h6 {
+        font-size: 1.5rem;
+    }
+
+    p {
+        margin-top: 24px;
+        font-size: 1rem;
+    }
+
+    #counter {
+        font-size: 10rem;
+    }
+
+    #counter::after {
+        font-size: 2rem;
+        transform: translate(20%, -167%) rotate(-90deg);
+    }
+
+    .button {
+        padding: 16px 8px;
+        font-size: 1rem;
+        margin: 4px 2px;
+        width: 230px;
+    }
 }

@@ -1,28 +1,11 @@
 import './style.css'
 import * as THREE from 'three'
-import * as dat from 'lil-gui'
-import gsap from 'gsap'
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-
-/**
- * Debug
- */
-// const gui = new dat.GUI()
-
-// gui
-//     .addColor(parameters, 'materialColor')
-//     .onChange(() => {
-//         material.color.set(parameters.materialColor)
-//         particlesMaterial.color.set(parameters.materialColor)
-//         for (let section of sections) {
-//             section.style.color = parameters.materialColor
-//         }
-//     })
 
 /**
  * Base
  */
-// Canvas
+// Selectors
 const canvas = document.querySelector('canvas.webgl')
 const sections = document.querySelectorAll('.section')
 const counter = document.querySelector('#counter')
@@ -32,18 +15,7 @@ const scene = new THREE.Scene()
 
 // Loaders
 const gltfLoader = new GLTFLoader()
-
-// Update Materials
-// function updateAllMaterials() {
-//     scene.traverse((child) => {
-//         // if(child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
-//         //     child.material = new THREE.MeshBasicMaterial( { color: 0xffffff } )
-//         // }
-//         if (!child.isMesh) return;
-//         child.material = child.material.clone();
-//         child.material.wireframe = true
-//     })
-// }
+const textureLoader = new THREE.TextureLoader()
 
 /**
  * Sizes
@@ -68,33 +40,35 @@ window.addEventListener('resize', () => {
 })
 
 /**
- * Objects
+ * Animals
  */
-// Material
-
-// Meshes
 const objectsDistance = 4
 const animals = ['fish', 'dolphin', 'mantaray', 'shark', 'whale']
 const customData = {
     fish: {
         index: 1,
-        scale: 0.15
+        scale: 0.15,
+        speed: 0.8
     },
     dolphin: {
         index: 2,
-        scale: 0.18
+        scale: 0.18,
+        speed: 1
     },
     mantaray: {
         index: 3,
-        scale: 0.2
+        scale: 0.2,
+        speed: 2
     },
     shark: {
         index: 4,
-        scale: 0.3
+        scale: 0.2,
+        speed: 1.5
     },
     whale: {
         index: 5,
-        scale: 0.6
+        scale: 0.4,
+        speed: 2.5
     },
 }
 const models = {}
@@ -106,8 +80,6 @@ for(let animal of animals) {
             const index = animals.indexOf(animal)
             models[animal] = gltf
             models[animal].scene = gltf.scene
-            // models[animal].scene.children[0].children[1].children[0].material.wireframe = true
-            // // models[animal].scene.children[0].children[1].children[0].material.color = new THREE.Color(1, 1, 1)
             models[animal].scene.children[0].children[1].children[1].material.wireframe = true
             models[animal].scene.scale.set(customData[animal].scale, customData[animal].scale, customData[animal].scale)
             models[animal].scene.position.y = - (index + 1) * objectsDistance
@@ -127,9 +99,10 @@ for(let animal of animals) {
 /**
  * Particles
  */
-// Geometry
 const particlesCount = 400
 const positions = new Float32Array(particlesCount * 3)
+const particleMaterial = textureLoader.load('textures/bubble.png')
+
 for( let i = 0; i < particlesCount; i++ ) {
     const i3 = i * 3
 
@@ -145,7 +118,8 @@ particlesGeometry.setAttribute(
 const particlesMaterial = new THREE.PointsMaterial({
     color: '#ffffff',
     sizeAttenuation: true,
-    size: 0.03
+    size: 0.15,
+    map: particleMaterial
 })
 const particles = new THREE.Points(particlesGeometry, particlesMaterial)
 scene.add(particles)
@@ -190,17 +164,10 @@ window.addEventListener('scroll', () => {
 
     if(newSection !== currentSection) {
         currentSection = newSection
+    }
 
-        // gsap.to(
-        //     meshes[currentSection].rotation,
-        //     {
-        //         duration: 1.5,
-        //         ease: 'power2.inOut',
-        //         x: '+=5',
-        //         y: '+=6',
-        //         z: '+=1.5'
-        //     }
-        // )
+    if (currentSection > 0) {
+        sections[currentSection - 1].style.opacity = 1
     }
 
 
@@ -248,26 +215,18 @@ const tick = () =>
     cameraGroup.position.x += (parallaxX - cameraGroup.position.x) * 5 * deltaTime
     cameraGroup.position.y += (parallaxY - cameraGroup.position.y) * 5 * deltaTime
 
-    // Animate Meshes
-    // for(const mesh of meshes) {
-    //     mesh.rotation.x += deltaTime * 0.1
-    //     mesh.rotation.y += deltaTime * 0.12
-    // }
-
     //animate animals
-    for(let animal of animals) {
+    for (let animal of animals) {
         if (models[animal]?.scene && models[animal]?.mixer) {
-            const y = models[animal].scene.position.y
             models[animal].mixer.update(deltaTime)
-            models[animal].scene.rotation.y += deltaTime
-            // models[animal].scene.position.set(
-            //     -Math.sin(elapsedTime) * 2,
-            //     y + Math.sin(elapsedTime) * 0.005,
-            //     -Math.cos(elapsedTime) * 2
-            // )
-            models[animal].scene.position.x = -Math.sin(elapsedTime) * 2
-            models[animal].scene.position.z = -Math.cos(elapsedTime) * 2
+            models[animal].scene.rotation.y += deltaTime / customData[animal].speed
+            models[animal].scene.position.x = -Math.sin(elapsedTime / customData[animal].speed) * 2
+            models[animal].scene.position.z = -Math.cos(elapsedTime / customData[animal].speed) * 2
         }
+    }
+
+    if (models[animals[currentSection - 1]]?.scene) {
+        canvas.style.zIndex = models[animals[currentSection - 1]]?.scene.position.z > 0 ? 1 : 0
     }
 
     // Render
