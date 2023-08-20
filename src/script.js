@@ -107,7 +107,6 @@ for(let animal of animals) {
             models[animal].scene.children[0].children[1].children[1].material.wireframe = true
             models[animal].scene.scale.set(customData[animal].scale, customData[animal].scale, customData[animal].scale)
             models[animal].scene.position.y = - (index + 1) * objectsDistance
-            models[animal].scene.rotation.y = -Math.PI * 0.5
 
             models[animal].mixer = new THREE.AnimationMixer( models[animal].scene )
             models[animal].action = models[animal].mixer.clipAction( gltf.animations[ 0 ] )
@@ -142,6 +141,7 @@ particlesGeometry.setAttribute(
 const particlesMaterial = new THREE.PointsMaterial({
     color: '#ffffff',
     sizeAttenuation: true,
+    depthWrite: false,
     size: 0.15,
     map: particleMaterial
 })
@@ -243,7 +243,7 @@ const tick = () =>
     for (let animal of animals) {
         if (models[animal]?.scene && models[animal]?.mixer) {
             models[animal].mixer.update(deltaTime)
-            models[animal].scene.rotation.y += deltaTime / customData[animal].speed
+            models[animal].scene.rotation.y = elapsedTime / customData[animal].speed + (-Math.PI * 0.5)
             models[animal].scene.position.x = -Math.sin(elapsedTime / customData[animal].speed) * 2
             models[animal].scene.position.z = -Math.cos(elapsedTime / customData[animal].speed) * 2
         }
