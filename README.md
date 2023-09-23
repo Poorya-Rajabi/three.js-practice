@@ -23,9 +23,10 @@
 - [PARTICLES](#particles)
 - [RAYCASTER](#raycaster)
 - [PHYSICS](#physics)
+- [REALISTIC RENDER](#realistic-render)
+- [Shaders](#shaders)
 - [IMPORT MODELS](#import-models)
 - [OTHERS](#others)
-- [REALISTIC RENDER](#realistic-render)
 
 </details>
 
@@ -1246,6 +1247,99 @@ Shadow Acne problem (Normal Bias Light)
 ```js
 directionalLight.shadow.normalBias = 0.05
 ```
+
+-----------
+Shaders
+-----------
+### Summary
+* The **Vertex Shader** position the vertices on the render
+* The **Fragment Shader** color each visible fragment (or pixel) of that geometry
+* The **Fragment Shader** is executed after the **Vertex Shader**
+* Information that changes between each vertex (like their positions) are called **Attributes** and can only be used in **Vertex Shader**
+* Information that doesn't change between vertices (or fragment) are called **Uniforms** and can be used in both the **Vertex Shader** and the **Fragment Shader**
+* We can send data from the **Vertex Shader** to the **Fragment Shader** by using **Varying**
+* **Varying** values are interpolated between vertices
+
+### Steps Overview
+1. Data (Attributes & Uniforms)
+2. Vertex Shader
+3. Varying (Uniform)
+4. Fragment Shader
+5. Render
+
+##### Using the RawShaderMaterial
+```js
+const material = new THREE.RawShaderMaterial({
+  vertexShader: `
+        uniform mat4 projectionMatrix;
+        uniform mat4 viewMatrix;
+        uniform mat4 modelMatrix;
+        
+        attribute vec3 position;
+        
+        void main() {
+            gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 0.1);
+        }
+    `,
+  fragmentShader: `
+        precision mediump float;
+        
+        void main() {
+            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        }
+    `
+})
+```
+
+lets to write this code by using modular structure:  <br />
+<code>index.js</code>
+```js
+import testVertexShader from './shaders/test/vertex.glsl'
+import testFragmentShader from './shaders/test/fragment.glsl'
+
+const material = new THREE.RawShaderMaterial({
+    vertexShader: testVertexShader,
+    fragmentShader: testFragmentShader
+})
+```
+create a file with .glsl extension for vertex shader  <br />
+<code>vertex.glsl</code>
+```glsl
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 modelMatrix;
+
+attribute vec3 position;
+
+void main() {
+  gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 0.1);
+}
+```
+create a file with .glsl extension for fragment shader  <br />
+<code>fragment.glsl</code>
+```glsl
+precision mediump float;
+
+void main() {
+  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+```
+config the bundler for glsl files  <br />
+<code>webpack.common.js</code>
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(glsl|vs|fs|vert|frag)$/,
+                exclude: /node_modules/,
+              use: ['raw-loader']
+      }]}}
+```
+
+
+
+
 
 -----------
 INTRO AND LOADING PROGRESS
