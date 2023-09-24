@@ -26,14 +26,21 @@ const textureLoader = new THREE.TextureLoader()
  * Test mesh
  */
 // Geometry
-const geometry = new THREE.PlaneGeometry(1, 1, 32, 32)
+const geometry = new THREE.PlaneBufferGeometry(1, 1, 32, 32)
+
+const count = geometry.attributes.position.count
+const random = new Float32Array(count)
+
+for(let _ = 0; _ <= random.length; _++) {
+    random[_] = Math.random()
+}
+
+geometry.setAttribute('aRandom', new THREE.BufferAttribute(random, 1))
 
 // Material
 const material = new THREE.RawShaderMaterial({
     vertexShader: testVertexShader,
-    fragmentShader: testFragmentShader,
-    side: THREE.DoubleSide,
-    wireframe: true
+    fragmentShader: testFragmentShader
 })
 
 // Mesh
