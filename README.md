@@ -23,9 +23,10 @@
 - [PARTICLES](#particles)
 - [RAYCASTER](#raycaster)
 - [PHYSICS](#physics)
+- [REALISTIC RENDER](#realistic-render)
+- [Shaders](#shaders)
 - [IMPORT MODELS](#import-models)
 - [OTHERS](#others)
-- [REALISTIC RENDER](#realistic-render)
 
 </details>
 
@@ -42,10 +43,11 @@ npm run build
 ```
 
 ## Demo
-You can try out by clicking on this demo links:
-[Haunted House](https://poorya-hh.netlify.app/)
-[Galaxy](https://galaxy-lovcqwrdn-poorya-rajabi.vercel.app/)
-[Other](https://three-js-practice-lovat.vercel.app/)
+You can try out by clicking on this demo links: <br/>
+* [Haunted House](https://poorya.netlify.app/)
+* [Galaxy](https://galaxy-lovcqwrdn-poorya-rajabi.vercel.app/)
+* [Post Processing](https://vercel.live/open-feedback/threejs-git-post-processing-poorya-rajabi.vercel.app)
+* [Other](https://three-js-practice-lovat.vercel.app/)
 -----------
 three.js important topics - (just an example from each topic):
 
@@ -1246,6 +1248,282 @@ Shadow Acne problem (Normal Bias Light)
 ```js
 directionalLight.shadow.normalBias = 0.05
 ```
+
+-----------
+Shaders
+-----------
+Documentation:
+* [Shader](https://www.khronos.org/opengl/wiki/Shader)
+* [OpenGL_Shading_Language](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language)
+* [the Book of Shaders](https://thebookofshaders.com/)
+* [Learn OpenGl](https://learnopengl.com/)
+* [shadertoy](https://www.shadertoy.com/)
+### Summary
+* The **Vertex Shader** position the vertices on the render
+* The **Fragment Shader** color each visible fragment (or pixel) of that geometry
+* The **Fragment Shader** is executed after the **Vertex Shader**
+* Information that changes between each vertex (like their positions) are called **Attributes** and can only be used in **Vertex Shader**
+* Information that doesn't change between vertices (or fragment) are called **Uniforms** and can be used in both the **Vertex Shader** and the **Fragment Shader**
+* We can send data from the **Vertex Shader** to the **Fragment Shader** by using **Varying**
+* **Varying** values are interpolated between vertices
+
+### Steps Overview
+1. Data (Attributes & Uniforms)
+2. Vertex Shader
+3. Varying (Uniform)
+4. Fragment Shader
+5. Render
+
+##### Using the RawShaderMaterial
+```js
+const material = new THREE.RawShaderMaterial({
+  vertexShader: `
+        uniform mat4 projectionMatrix;
+        uniform mat4 viewMatrix;
+        uniform mat4 modelMatrix;
+        
+        attribute vec3 position;
+        
+        void main() {
+            gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 0.1);
+        }
+    `,
+  fragmentShader: `
+        precision mediump float;
+        
+        void main() {
+            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        }
+    `,
+  // You can use 'side' and 'transparent' and 'wireframe' properties
+})
+```
+
+#### Let's write this code by using modular structure:  <br />
+<code>index.js</code>
+```js
+import testVertexShader from './shaders/test/vertex.glsl'
+import testFragmentShader from './shaders/test/fragment.glsl'
+
+const material = new THREE.RawShaderMaterial({
+    vertexShader: testVertexShader,
+    fragmentShader: testFragmentShader
+})
+```
+create a file with .glsl extension for vertex shader  <br />
+<code>vertex.glsl</code>
+```glsl
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 modelMatrix;
+
+attribute vec3 position;
+
+void main() {
+  gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 0.1);
+}
+```
+create a file with .glsl extension for fragment shader  <br />
+<code>fragment.glsl</code>
+```glsl
+precision mediump float;
+
+void main() {
+  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+```
+config the bundler for glsl files  <br />
+<code>webpack.common.js</code>
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(glsl|vs|fs|vert|frag)$/,
+                exclude: /node_modules/,
+              use: ['raw-loader']
+      }]}}
+```
+
+### GLSL <br/>
+The Shader language called (Open**GL** **S**hading **L**anguage) <br/>
+close to **C** Language <br/>
+There is no console <br/>
+The indentation is not essential ... <br>
+[GLSL_Shaders](https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_on_the_web/GLSL_Shaders)
+#### Variables
+```glsl
+void main() {
+  // Integer & Float
+  float foo = -1.0;
+  int bar = 1;
+  
+  float a = 1.5;
+  int b = 2;
+  float c = a * float(b);
+  
+  // Boolian
+  bool x = true;
+  bool y = false;
+  
+  // Verctor 2
+  vec2 test = vec2(1.0, 2.0);
+  
+  vec2 test = vec2(0.0);
+  test.x = 1.0;
+  test.y = 2.0;
+  
+  test *= 2.0; // result: (2.0, 4.0)
+  
+  // Vector3 (just like vec2)
+  vec3 vertex = vec3(1.0, 0.0, 3.0);
+
+  vec3 color = vec3(0.0);
+  color.r = 3.0; // or color.x
+  color.g = 2.2; // or color.y
+  color.b = 2.2; // or color.z
+  // and you can mix them
+  
+  vec2 foo = vec2(1.0, 2.0);
+  vec3 bar = vec3(foo, 3.0);
+  vec2 fooBar = bar.xy; // or bar.xz | bar.yz
+  
+  // Vector4 (just like vec2 & vec3)
+  vec4 foo = vec4(1.0, 2.0, 3.0, 4.0); // (x, y, z, w)
+  float bar = foo.w;
+}
+```
+#### Functions
+```glsl
+void justDoSomething() {
+    int x = 1;
+    int y = 3;
+}
+
+float sum(float a, float b) {
+    return a + b;
+}
+
+void main() {
+    float result = sum(1.0, 2.0);
+}
+```
+
+#### How to use the attribute and varying
+<code>index.js</code>
+```js
+const geometry = new THREE.PlaneBufferGeometry(1, 1, 32, 32)
+
+const count = geometry.attributes.position.count
+const random = new Float32Array(count)
+
+for(let i = 0; i <= random.length; i++) {
+    random[i] = Math.random()
+}
+
+geometry.setAttribute('aRandom', new THREE.BufferAttribute(random, 1))
+```
+<code>vertex.glsl</code>
+```glsl
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 modelMatrix;
+
+attribute vec3 position;
+attribute float aRandom;
+
+varying float vRandom;
+
+void main() {
+    vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+    modelPosition.z += aRandom * 0.1;
+
+    vec4 viewPosition = viewMatrix * modelPosition;
+    vec4 projectedPosition = projectionMatrix * viewPosition;
+
+    gl_Position = projectedPosition;
+
+    vRandom = aRandom;
+}
+```
+<code>fragment.glsl</code>
+```glsl
+precision mediump float;
+
+varying float vRandom;
+
+void main() {
+  gl_FragColor = vec4(1.0, vRandom, 0.0, 1.0);
+}
+
+```
+
+### Uniforms
+```js
+const textureLoader = new THREE.TextureLoader()
+const flagTexture = textureLoader.load('/textures/iran-flag.jpg')
+
+const material = new THREE.RawShaderMaterial({
+    // ...
+    uniforms: {
+        uFrequency: { value: new THREE.Vector4(10, 5) },
+        uTime: { value: 0 },
+        uColor: { value: new THREE.Color('orange') },
+        uTexture: { value: flagTexture }
+    }
+})
+```
+<code>vertex.glsl</code>
+```glsl
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 modelMatrix;
+uniform vec2 uFrequency;
+uniform float uTime;
+
+attribute vec3 position;
+attribute vec2 uv;
+
+varying vec2 vUv;
+
+void main() {
+  vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+
+  modelPosition.z += sin(modelPosition.x * uFrequency.x - uTime) * 0.1;
+  modelPosition.z += sin(modelPosition.y * uFrequency.y - uTime) * 0.1;
+
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectedPosition = projectionMatrix * viewPosition;
+
+  gl_Position = projectedPosition;
+
+  vUv = uv;
+}
+```
+<code>fragment.glsl</code>
+```glsl
+precision mediump float;
+
+uniform vec3 uColor;
+uniform sampler2D uTexture;
+
+varying vec2 vUv;
+
+void main() {
+  vec4 textureColor = texture2D(uTexture, vUv);
+  gl_FragColor = textureColor;
+}
+```
+
+##### Using the ShaderMaterial
+remove the following uniform and attribute and precision in both shaders:
+* uniform mat4 projectionMatrix;
+* uniform mat4 viewMatrix;
+* uniform mat4 modelMatrix;
+* attribute vec3 position;
+* attribute vec2 uv;
+* precision mediump float;
+
 
 -----------
 INTRO AND LOADING PROGRESS
