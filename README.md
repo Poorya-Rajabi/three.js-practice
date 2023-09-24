@@ -1257,6 +1257,7 @@ Documentation:
 * [OpenGL_Shading_Language](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language)
 * [the Book of Shaders](https://thebookofshaders.com/)
 * [Learn OpenGl](https://learnopengl.com/)
+* [shadertoy](https://www.shadertoy.com/)
 ### Summary
 * The **Vertex Shader** position the vertices on the render
 * The **Fragment Shader** color each visible fragment (or pixel) of that geometry
@@ -1456,6 +1457,72 @@ void main() {
 }
 
 ```
+
+### Uniforms
+```js
+const textureLoader = new THREE.TextureLoader()
+const flagTexture = textureLoader.load('/textures/iran-flag.jpg')
+
+const material = new THREE.RawShaderMaterial({
+    // ...
+    uniforms: {
+        uFrequency: { value: new THREE.Vector4(10, 5) },
+        uTime: { value: 0 },
+        uColor: { value: new THREE.Color('orange') },
+        uTexture: { value: flagTexture }
+    }
+})
+```
+<code>vertex.glsl</code>
+```glsl
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 modelMatrix;
+uniform vec2 uFrequency;
+uniform float uTime;
+
+attribute vec3 position;
+attribute vec2 uv;
+
+varying vec2 vUv;
+
+void main() {
+  vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+
+  modelPosition.z += sin(modelPosition.x * uFrequency.x - uTime) * 0.1;
+  modelPosition.z += sin(modelPosition.y * uFrequency.y - uTime) * 0.1;
+
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectedPosition = projectionMatrix * viewPosition;
+
+  gl_Position = projectedPosition;
+
+  vUv = uv;
+}
+```
+<code>fragment.glsl</code>
+```glsl
+precision mediump float;
+
+uniform vec3 uColor;
+uniform sampler2D uTexture;
+
+varying vec2 vUv;
+
+void main() {
+  vec4 textureColor = texture2D(uTexture, vUv);
+  gl_FragColor = textureColor;
+}
+```
+
+##### Using the ShaderMaterial
+remove the following uniform and attribute and precision in both shaders:
+* uniform mat4 projectionMatrix;
+* uniform mat4 viewMatrix;
+* uniform mat4 modelMatrix;
+* attribute vec3 position;
+* attribute vec2 uv;
+* precision mediump float;
 
 
 -----------

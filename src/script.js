@@ -21,6 +21,7 @@ const scene = new THREE.Scene()
  * Textures
  */
 const textureLoader = new THREE.TextureLoader()
+const flagTexture = textureLoader.load('/textures/iran-flag.jpg')
 
 /**
  * Test mesh
@@ -28,23 +29,31 @@ const textureLoader = new THREE.TextureLoader()
 // Geometry
 const geometry = new THREE.PlaneBufferGeometry(1, 1, 32, 32)
 
-const count = geometry.attributes.position.count
-const random = new Float32Array(count)
-
-for(let _ = 0; _ <= random.length; _++) {
-    random[_] = Math.random()
-}
-
-geometry.setAttribute('aRandom', new THREE.BufferAttribute(random, 1))
+// const count = geometry.attributes.position.count
+// const random = new Float32Array(count)
+//
+// for(let _ = 0; _ <= random.length; _++) {
+//     random[_] = Math.random()
+// }
+//
+// geometry.setAttribute('aRandom', new THREE.BufferAttribute(random, 1))
 
 // Material
-const material = new THREE.RawShaderMaterial({
+const material = new THREE.ShaderMaterial({
     vertexShader: testVertexShader,
-    fragmentShader: testFragmentShader
+    fragmentShader: testFragmentShader,
+    side: THREE.DoubleSide,
+    uniforms: {
+        uFrequency: { value: new THREE.Vector4(10, 5) },
+        uTime: { value: 0 },
+        uColor: { value: new THREE.Color('orange') },
+        uTexture: { value: flagTexture }
+    }
 })
 
 // Mesh
 const mesh = new THREE.Mesh(geometry, material)
+mesh.scale.y = 2 / 3
 scene.add(mesh)
 
 /**
@@ -99,6 +108,9 @@ const clock = new THREE.Clock()
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
+
+    // Update Material
+    material.uniforms.uTime.value = elapsedTime
 
     // Update controls
     controls.update()
