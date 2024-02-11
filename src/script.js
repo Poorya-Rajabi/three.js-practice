@@ -1,60 +1,45 @@
 import './style.css'
 import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import * as dat from 'lil-gui'
-import testVertexShader from './shaders/test/vertex.glsl'
-import testFragmentShader from './shaders/test/fragment.glsl'
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 /**
  * Base
  */
-// Debug
-const gui = new dat.GUI()
-
-// Canvas
+// Selectors
 const canvas = document.querySelector('canvas.webgl')
+const sections = document.querySelectorAll('.section')
+const counter = document.querySelector('#counter')
+const loadingBarElement = document.querySelector('.loading-bar')
+const loadingContainerElement = document.querySelector('.loading-container')
 
 // Scene
 const scene = new THREE.Scene()
 
-/**
- * Textures
- */
-const textureLoader = new THREE.TextureLoader()
-const flagTexture = textureLoader.load('/textures/iran-flag.jpg')
+// Loaders
+const loadingManager = new THREE.LoadingManager(
+    // Loaded
+    () =>
+    {
+        window.setTimeout(() =>
+        {
+            // Update loadingBarElement
+            loadingBarElement.classList.add('ended')
+            loadingBarElement.style.transform = ''
+            loadingContainerElement.style.opacity = 0
+            loadingContainerElement.style.zIndex = -1
+        }, 500)
+    },
 
-/**
- * Test mesh
- */
-// Geometry
-const geometry = new THREE.PlaneBufferGeometry(1, 1, 32, 32)
-
-// const count = geometry.attributes.position.count
-// const random = new Float32Array(count)
-//
-// for(let _ = 0; _ <= random.length; _++) {
-//     random[_] = Math.random()
-// }
-//
-// geometry.setAttribute('aRandom', new THREE.BufferAttribute(random, 1))
-
-// Material
-const material = new THREE.ShaderMaterial({
-    vertexShader: testVertexShader,
-    fragmentShader: testFragmentShader,
-    side: THREE.DoubleSide,
-    uniforms: {
-        uFrequency: { value: new THREE.Vector4(10, 5) },
-        uTime: { value: 0 },
-        uColor: { value: new THREE.Color('orange') },
-        uTexture: { value: flagTexture }
+    // Progress
+    (itemUrl, itemsLoaded, itemsTotal) =>
+    {
+        // Calculate the progress and update the loadingBarElement
+        const progressRatio = itemsLoaded / itemsTotal
+        loadingBarElement.style.transform = `scaleX(${progressRatio})`
     }
-})
-
-// Mesh
-const mesh = new THREE.Mesh(geometry, material)
-mesh.scale.y = 2 / 3
-scene.add(mesh)
+)
+const gltfLoader = new GLTFLoader(loadingManager)
+const textureLoader = new THREE.TextureLoader(loadingManager)
 
 /**
  * Sizes
@@ -64,8 +49,7 @@ const sizes = {
     height: window.innerHeight
 }
 
-window.addEventListener('resize', () =>
-{
+window.addEventListener('resize', () => {
     // Update sizes
     sizes.width = window.innerWidth
     sizes.height = window.innerHeight
@@ -80,40 +64,194 @@ window.addEventListener('resize', () =>
 })
 
 /**
+ * Animals
+ */
+const objectsDistance = 4
+const animals = ['fish', 'dolphin', 'mantaray', 'shark', 'whale']
+const customData = {
+    fish: {
+        index: 1,
+        scale: 0.15,
+        speed: 0.8
+    },
+    dolphin: {
+        index: 2,
+        scale: 0.18,
+        speed: 1
+    },
+    mantaray: {
+        index: 3,
+        scale: 0.2,
+        speed: 2
+    },
+    shark: {
+        index: 4,
+        scale: 0.2,
+        speed: 1.5
+    },
+    whale: {
+        index: 5,
+        scale: 0.4,
+        speed: 2.5
+    },
+}
+const models = {}
+
+for(let animal of animals) {
+    gltfLoader.load(
+        `/models/${animal}/${animal}.gltf`,
+        (gltf) => {
+            const index = animals.indexOf(animal)
+            models[animal] = gltf
+            models[animal].scene = gltf.scene
+            models[animal].scene.children[0].children[1].children[1].material.wireframe = true
+            models[animal].scene.scale.set(customData[animal].scale, customData[animal].scale, customData[animal].scale)
+            models[animal].scene.position.y = - (index + 1) * objectsDistance
+
+            models[animal].mixer = new THREE.AnimationMixer( models[animal].scene )
+            models[animal].action = models[animal].mixer.clipAction( gltf.animations[ 0 ] )
+            models[animal].action.play()
+
+
+            // updateAllMaterials()
+            scene.add( models[animal].scene )
+        }
+    )
+}
+
+/**
+ * Particles
+ */
+const particlesCount = 400
+const positions = new Float32Array(particlesCount * 3)
+const particleMaterial = textureLoader.load('textures/bubble.png')
+
+for( let i = 0; i < particlesCount; i++ ) {
+    const i3 = i * 3
+
+    positions[i3    ] = (Math.random() - 0.5) * 10
+    positions[i3 + 1] = objectsDistance * 0.5 - Math.random() * objectsDistance * animals.length
+    positions[i3 + 2] = (Math.random() - 0.5) * 10
+}
+const particlesGeometry = new THREE.BufferGeometry()
+particlesGeometry.setAttribute(
+ 'position',
+ new THREE.BufferAttribute(positions, 3)
+)
+const particlesMaterial = new THREE.PointsMaterial({
+    color: '#ffffff',
+    sizeAttenuation: true,
+    depthWrite: false,
+    size: 0.15,
+    map: particleMaterial
+})
+const particles = new THREE.Points(particlesGeometry, particlesMaterial)
+scene.add(particles)
+
+/**
+ * Lights
+ */
+const directionalLight = new THREE.DirectionalLight('#ffffff', 1)
+directionalLight.position.set(1, 1, 0)
+scene.add(directionalLight)
+
+/**
  * Camera
  */
-// Base camera
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(0.25, - 0.25, 1)
-scene.add(camera)
+const cameraGroup = new THREE.Group()
+scene.add(cameraGroup)
 
-// Controls
-const controls = new OrbitControls(camera, canvas)
-controls.enableDamping = true
+const camera = new THREE.PerspectiveCamera(35, sizes.width / sizes.height, 0.1, 100)
+camera.position.z = 6
+cameraGroup.add(camera)
 
 /**
  * Renderer
  */
 const renderer = new THREE.WebGLRenderer({
-    canvas: canvas
+    canvas: canvas,
+    alpha: true
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 /**
+ * Scroll
+ */
+let scrollY = window.scrollY
+let currentSection = 0
+
+window.addEventListener('scroll', () => {
+    scrollY = window.scrollY
+    const ration = window.scrollY / sizes.height
+    const newSection = Math.round(ration)
+
+    if(newSection !== currentSection) {
+        currentSection = newSection
+    }
+
+    if (currentSection > 0) {
+        sections[currentSection - 1].style.opacity = 1
+    }
+
+
+    if (ration < 1) {
+        counter.style.opacity = 0
+    } else if (ration < 3) {
+        counter.style.opacity = 1
+        counter.innerHTML = Math.floor(ration * 30) - 29
+    } else if (ration < 4) {
+        counter.style.opacity = 1
+        counter.innerHTML = Math.floor(ration * 360 / 4)
+    } else {
+        counter.style.opacity = 0
+    }
+})
+
+/**
+ * Cursor
+ */
+const cursor = new THREE.Vector2()
+
+window.addEventListener('mousemove', (event) => {
+    cursor.x = (event.clientX / sizes.width) - 0.5
+    cursor.y = (event.clientY / sizes.height) - 0.5
+})
+
+/**
  * Animate
  */
 const clock = new THREE.Clock()
+let previousTime = 0
 
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
+    const deltaTime = elapsedTime - previousTime
+    previousTime = elapsedTime
 
-    // Update Material
-    material.uniforms.uTime.value = elapsedTime
+    // Scroll
+    camera.position.y = - scrollY / sizes.height * objectsDistance
 
-    // Update controls
-    controls.update()
+    // Parallax
+    const  parallaxX = cursor.x * 0.5
+    const  parallaxY = - cursor.y * 0.5
+    cameraGroup.position.x += (parallaxX - cameraGroup.position.x) * 5 * deltaTime
+    cameraGroup.position.y += (parallaxY - cameraGroup.position.y) * 5 * deltaTime
+
+    //animate animals
+    for (let animal of animals) {
+        if (models[animal]?.scene && models[animal]?.mixer) {
+            models[animal].mixer.update(deltaTime)
+            models[animal].scene.rotation.y = elapsedTime / customData[animal].speed + (-Math.PI * 0.5)
+            models[animal].scene.position.x = -Math.sin(elapsedTime / customData[animal].speed) * 2
+            models[animal].scene.position.z = -Math.cos(elapsedTime / customData[animal].speed) * 2
+        }
+    }
+
+    if (models[animals[currentSection - 1]]?.scene) {
+        canvas.style.zIndex = models[animals[currentSection - 1]]?.scene.position.z > 0 ? 1 : 0
+    }
 
     // Render
     renderer.render(scene, camera)
