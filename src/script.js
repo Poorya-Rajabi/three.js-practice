@@ -22,12 +22,15 @@ const scene = new THREE.Scene()
  */
 const textureLoader = new THREE.TextureLoader()
 const flagTexture = textureLoader.load('/textures/iran-flag.jpg')
+const texture1 = textureLoader.load('/textures/1.jpg')
+const texture2 = textureLoader.load('/textures/2.jpg')
 
 /**
  * Test mesh
  */
 // Geometry
 const geometry = new THREE.PlaneBufferGeometry(1, 1, 32, 32)
+// const geometry = new THREE.PlaneGeometry(700, 394,1,1)
 
 // const count = geometry.attributes.position.count
 // const random = new Float32Array(count)
@@ -44,17 +47,19 @@ const material = new THREE.ShaderMaterial({
     fragmentShader: testFragmentShader,
     side: THREE.DoubleSide,
     uniforms: {
-        uFrequency: { value: new THREE.Vector4(10, 5) },
         uTime: { value: 0 },
-        uColor: { value: new THREE.Color('orange') },
-        uTexture: { value: flagTexture }
+        iChannel0:  { value: texture1 },
+        iChannel1:  { value: texture2 },
     }
 })
 
+material.uniforms.iChannel0.value.wrapS = material.uniforms.iChannel0.value.wrapT = THREE.RepeatWrapping;
+material.uniforms.iChannel1.value.wrapS = material.uniforms.iChannel1.value.wrapT = THREE.RepeatWrapping;
+
 // Mesh
 const mesh = new THREE.Mesh(geometry, material)
-mesh.scale.y = 2 / 3
 scene.add(mesh)
+console.log(scene)
 
 /**
  * Sizes
@@ -84,7 +89,7 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(0.25, - 0.25, 1)
+camera.position.set(0, 0, 5)
 scene.add(camera)
 
 // Controls

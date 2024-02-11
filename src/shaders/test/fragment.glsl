@@ -1,13 +1,26 @@
-uniform vec3 uColor;
-uniform sampler2D uTexture;
-
-//varying float vRandom;
+uniform sampler2D iChannel0;
+uniform sampler2D iChannel1;
+uniform float uTime;
 varying vec2 vUv;
-varying float vElevation;
 
-void main() {
-//    gl_FragColor = vec4(1.0, vRandom, 0.0, 1.0);
-    vec4 textureColor = texture2D(uTexture, vUv);
-    textureColor.rgb *= vElevation * 2.0 + 0.9;
-    gl_FragColor = textureColor;
+void main()
+{
+    vec2 p = -1.0 + 2.0 * vUv;
+    vec2 q = p - vec2(0.5, 0.5);
+
+    q.x += sin(uTime* 0.6) * 0.2;
+    q.y += cos(uTime* 0.4) * 0.3;
+
+    float len = length(q);
+
+    float a = atan(q.y, q.x) + uTime * 0.3;
+    float b = atan(q.y, q.x) + uTime * 0.3;
+    float r1 = 0.3 / len + uTime * 0.5;
+    float r2 = 0.2 / len + uTime * 0.5;
+
+    float m = (1.0 + sin(uTime * 0.5)) / 2.0;
+    vec4 tex1 = texture2D(iChannel0, vec2(a + 0.1 / len, r1 ));
+    vec4 tex2 = texture2D(iChannel1, vec2(b + 0.1 / len, r2 ));
+    vec3 col = vec3(mix(tex1, tex2, m));
+    gl_FragColor = vec4(col * len * 1.5, 1.0);
 }
